@@ -41,8 +41,12 @@ const orderSchema = new mongoose.Schema(
     },
     orderStatus: {
       type: String,
-      enum: ['confirmed', 'cancelled'],
+      enum: ['confirmed', 'cancelled', 'refunded'],
       default: 'confirmed',
+    },
+    refundedAt: {
+      type: Date,
+      default: null,
     },
     orderNumber: {
       type: String,

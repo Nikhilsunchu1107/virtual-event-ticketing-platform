@@ -101,6 +101,40 @@ const adminService = {
       throw error.response?.data || error.message;
     }
   },
+
+  // Get all orders (admin)
+  getAllOrders: async (filters = {}, token) => {
+    try {
+      const params = new URLSearchParams();
+      Object.keys(filters).forEach((key) => {
+        if (filters[key]) {
+          params.append(key, filters[key]);
+        }
+      });
+      const response = await axios.get(`/api/orders?${params}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
+  // Update order status (admin)
+  updateOrderStatus: async (orderId, status, token) => {
+    try {
+      const response = await axios.put(
+        `/api/orders/${orderId}/status`,
+        { status },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
 };
 
 export default adminService;

@@ -11,6 +11,7 @@ const {
   getOrderById,
   getAllOrders,
   cancelOrder,
+  updateOrderStatus,
   downloadTicket,
   getOrderStats,
 } = require('../controllers/orderController');
@@ -24,6 +25,7 @@ router.get('/:orderId/tickets/:ticketId/download', protect, downloadTicket);
 
 // Protected admin routes
 router.get('/', protect, admin, getAllOrders);
+router.put('/:id/status', protect, admin, updateOrderStatus);
 router.get('/admin/stats', protect, admin, getOrderStats);
 
 module.exports = router;

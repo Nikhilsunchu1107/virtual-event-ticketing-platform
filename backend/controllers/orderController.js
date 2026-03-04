@@ -240,6 +240,93 @@ exports.cancelOrder = async (req, res, next) => {
 };
 
 /**
+ * Update order status (Admin only)
+ * PUT /api/orders/:id/status
+ */
+exports.updateOrderStatus = async (req, res, next) => {
+  try {
+    const { status } = req.body;
+    const validStatuses = ['confirmed', 'cancelled', 'refunded'];
+
+    if (!status || !validStatuses.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid status. Must be one of: ${validStatuses.join(', ')}`,
+      });
+    }
+
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found',
+      });
+    }
+
+    const previousStatus = order.orderStatus;
+
+    // Prevent redundant updates
+    if (previousStatus === status) {
+      return res.status(400).json({
+        success: false,
+        message: `Order is already ${status}`,
+      });
+    }
+
+    // Restore inventory when moving to cancelled/refunded from confirmed
+    if (
+      previousStatus === 'confirmed' &&
+      (status === 'cancelled' || status === 'refunded')
+    ) {
+      for (const ticket of order.tickets) {
+        const event = await Event.findById(ticket.event);
+        if (event) {
+          event.ticketsSold = Math.max(0, event.ticketsSold - ticket.quantity);
+          await event.save();
+        }
+      }
+    }
+
+    // Deduct inventory when re-confirming a cancelled/refunded order
+    if (
+      (previousStatus === 'cancelled' || previousStatus === 'refunded') &&
+      status === 'confirmed'
+    ) {
+      for (const ticket of order.tickets) {
+        const event = await Event.findById(ticket.event);
+        if (event) {
+          const remaining = event.ticketsAvailable - event.ticketsSold;
+          if (ticket.quantity > remaining) {
+            return res.status(400).json({
+              success: false,
+              message: `Not enough tickets available for "${event.title}" to re-confirm`,
+            });
+          }
+          event.ticketsSold += ticket.quantity;
+          await event.save();
+        }
+      }
+    }
+
+    order.orderStatus = status;
+    if (status === 'refunded') {
+      order.refundedAt = new Date();
+      order.paymentStatus = 'failed';
+    }
+    await order.save();
+
+    res.status(200).json({
+      success: true,
+      message: `Order status updated to ${status}`,
+      order,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * Download ticket PDF
  * GET /api/orders/:orderId/tickets/:ticketId/download
  */

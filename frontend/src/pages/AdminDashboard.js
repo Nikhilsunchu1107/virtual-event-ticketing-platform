@@ -5,6 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import adminService from '../services/adminService';
+import inventoryService from '../services/inventoryService';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
@@ -13,8 +14,19 @@ const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
   const [analytics, setAnalytics] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [inventory, setInventory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
+
+  // Orders tab filters
+  const [orderStatusFilter, setOrderStatusFilter] = useState('');
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState('');
+
+  // Inventory tab state
+  const [adjustingEventId, setAdjustingEventId] = useState(null);
+  const [adjustmentValue, setAdjustmentValue] = useState(0);
 
   useEffect(() => {
     fetchDashboardData();
@@ -24,6 +36,7 @@ const AdminDashboard = () => {
     try {
       setLoading(true);
       setError('');
+      setSuccessMsg('');
       const token = localStorage.getItem('token');
 
       if (activeTab === 'dashboard') {
@@ -35,11 +48,90 @@ const AdminDashboard = () => {
       } else if (activeTab === 'analytics') {
         const response = await adminService.getEventsAnalytics(token);
         setAnalytics(response.analytics);
+      } else if (activeTab === 'orders') {
+        await fetchOrders();
+      } else if (activeTab === 'inventory') {
+        const response = await inventoryService.getInventoryOverview(token);
+        setInventory(response.inventory);
       }
     } catch (err) {
       setError(err.message || 'Failed to fetch data');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchOrders = async () => {
+    const token = localStorage.getItem('token');
+    const filters = {};
+    if (orderStatusFilter) filters.status = orderStatusFilter;
+    if (paymentStatusFilter) filters.paymentStatus = paymentStatusFilter;
+    const response = await adminService.getAllOrders(filters, token);
+    setOrders(response.orders);
+  };
+
+  const handleFilterOrders = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      await fetchOrders();
+    } catch (err) {
+      setError(err.message || 'Failed to fetch orders');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateOrderStatus = async (orderId, newStatus) => {
+    try {
+      setError('');
+      setSuccessMsg('');
+      const token = localStorage.getItem('token');
+      const response = await adminService.updateOrderStatus(orderId, newStatus, token);
+      setSuccessMsg(response.message);
+      // Refresh orders list
+      await fetchOrders();
+    } catch (err) {
+      setError(err.message || 'Failed to update order status');
+    }
+  };
+
+  const handleAdjustInventory = async (eventId) => {
+    try {
+      setError('');
+      setSuccessMsg('');
+      const token = localStorage.getItem('token');
+      const response = await inventoryService.adjustInventory(
+        eventId,
+        adjustmentValue,
+        token
+      );
+      setSuccessMsg(response.message);
+      setAdjustingEventId(null);
+      setAdjustmentValue(0);
+      // Refresh inventory list
+      const invResponse = await inventoryService.getInventoryOverview(token);
+      setInventory(invResponse.inventory);
+    } catch (err) {
+      setError(err.message || 'Failed to adjust inventory');
+    }
+  };
+
+  const getStockBadgeClass = (status) => {
+    switch (status) {
+      case 'in_stock': return 'stock-badge stock-in';
+      case 'low_stock': return 'stock-badge stock-low';
+      case 'sold_out': return 'stock-badge stock-out';
+      default: return 'stock-badge';
+    }
+  };
+
+  const getStockLabel = (status) => {
+    switch (status) {
+      case 'in_stock': return 'In Stock';
+      case 'low_stock': return 'Low Stock';
+      case 'sold_out': return 'Sold Out';
+      default: return status;
     }
   };
 
@@ -59,6 +151,18 @@ const AdminDashboard = () => {
             📊 Dashboard
           </button>
           <button
+            className={`tab-btn ${activeTab === 'orders' ? 'active' : ''}`}
+            onClick={() => setActiveTab('orders')}
+          >
+            📦 Orders
+          </button>
+          <button
+            className={`tab-btn ${activeTab === 'inventory' ? 'active' : ''}`}
+            onClick={() => setActiveTab('inventory')}
+          >
+            📋 Inventory
+          </button>
+          <button
             className={`tab-btn ${activeTab === 'users' ? 'active' : ''}`}
             onClick={() => setActiveTab('users')}
           >
@@ -73,6 +177,7 @@ const AdminDashboard = () => {
         </div>
 
         {error && <div className="alert alert-error">{error}</div>}
+        {successMsg && <div className="alert alert-success">{successMsg}</div>}
 
         {loading ? (
           <div className="loading-container">
@@ -175,6 +280,252 @@ const AdminDashboard = () => {
                       </div>
                     ))}
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* Orders Tab */}
+            {activeTab === 'orders' && (
+              <div className="orders-content">
+                <h2>📦 Order Management</h2>
+                <div className="filter-bar">
+                  <div className="filter-group">
+                    <label htmlFor="orderStatusFilter">Order Status:</label>
+                    <select
+                      id="orderStatusFilter"
+                      value={orderStatusFilter}
+                      onChange={(e) => setOrderStatusFilter(e.target.value)}
+                    >
+                      <option value="">All</option>
+                      <option value="confirmed">Confirmed</option>
+                      <option value="cancelled">Cancelled</option>
+                      <option value="refunded">Refunded</option>
+                    </select>
+                  </div>
+                  <div className="filter-group">
+                    <label htmlFor="paymentStatusFilter">Payment:</label>
+                    <select
+                      id="paymentStatusFilter"
+                      value={paymentStatusFilter}
+                      onChange={(e) => setPaymentStatusFilter(e.target.value)}
+                    >
+                      <option value="">All</option>
+                      <option value="completed">Completed</option>
+                      <option value="pending">Pending</option>
+                      <option value="failed">Failed</option>
+                    </select>
+                  </div>
+                  <button className="btn-small btn-filter" onClick={handleFilterOrders}>
+                    🔍 Filter
+                  </button>
+                </div>
+
+                <div className="orders-table">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Order #</th>
+                        <th>Customer</th>
+                        <th>Tickets</th>
+                        <th>Amount</th>
+                        <th>Payment</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {orders.length === 0 ? (
+                        <tr>
+                          <td colSpan="8" style={{ textAlign: 'center', padding: '30px' }}>
+                            No orders found
+                          </td>
+                        </tr>
+                      ) : (
+                        orders.map((order) => (
+                          <tr key={order._id}>
+                            <td><strong>{order.orderNumber}</strong></td>
+                            <td>
+                              <div>{order.user?.name}</div>
+                              <small style={{ color: '#888' }}>{order.user?.email}</small>
+                            </td>
+                            <td>{order.tickets?.length || 0}</td>
+                            <td><strong>${order.totalAmount.toFixed(2)}</strong></td>
+                            <td>
+                              <span className={`status-badge status-${order.paymentStatus}`}>
+                                {order.paymentStatus}
+                              </span>
+                            </td>
+                            <td>
+                              <span className={`status-badge status-${order.orderStatus}`}>
+                                {order.orderStatus}
+                              </span>
+                            </td>
+                            <td>{new Date(order.createdAt).toLocaleDateString()}</td>
+                            <td>
+                              <div className="action-buttons">
+                                {order.orderStatus === 'confirmed' && (
+                                  <>
+                                    <button
+                                      className="btn-small btn-cancel"
+                                      onClick={() =>
+                                        handleUpdateOrderStatus(order._id, 'cancelled')
+                                      }
+                                    >
+                                      Cancel
+                                    </button>
+                                    <button
+                                      className="btn-small btn-refund"
+                                      onClick={() =>
+                                        handleUpdateOrderStatus(order._id, 'refunded')
+                                      }
+                                    >
+                                      Refund
+                                    </button>
+                                  </>
+                                )}
+                                {(order.orderStatus === 'cancelled' ||
+                                  order.orderStatus === 'refunded') && (
+                                  <button
+                                    className="btn-small btn-confirm"
+                                    onClick={() =>
+                                      handleUpdateOrderStatus(order._id, 'confirmed')
+                                    }
+                                  >
+                                    Re-confirm
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* Inventory Tab */}
+            {activeTab === 'inventory' && (
+              <div className="inventory-content">
+                <h2>📋 Inventory Management</h2>
+                <div className="inventory-summary">
+                  <div className="inv-stat">
+                    <span className="inv-stat-value">
+                      {inventory.filter((e) => e.stockStatus === 'sold_out').length}
+                    </span>
+                    <span className="inv-stat-label">Sold Out</span>
+                  </div>
+                  <div className="inv-stat">
+                    <span className="inv-stat-value inv-stat-warn">
+                      {inventory.filter((e) => e.stockStatus === 'low_stock').length}
+                    </span>
+                    <span className="inv-stat-label">Low Stock</span>
+                  </div>
+                  <div className="inv-stat">
+                    <span className="inv-stat-value inv-stat-ok">
+                      {inventory.filter((e) => e.stockStatus === 'in_stock').length}
+                    </span>
+                    <span className="inv-stat-label">In Stock</span>
+                  </div>
+                </div>
+
+                <div className="inventory-table">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Event</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Available</th>
+                        <th>Sold</th>
+                        <th>Remaining</th>
+                        <th>Occupancy</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {inventory.length === 0 ? (
+                        <tr>
+                          <td colSpan="9" style={{ textAlign: 'center', padding: '30px' }}>
+                            No events found
+                          </td>
+                        </tr>
+                      ) : (
+                        inventory.map((event) => (
+                          <tr key={event._id}>
+                            <td>
+                              <strong>{event.title}</strong>
+                              <br />
+                              <small style={{ color: '#888' }}>
+                                {new Date(event.eventDate).toLocaleDateString()}
+                              </small>
+                            </td>
+                            <td>{event.category}</td>
+                            <td>${event.price}</td>
+                            <td>{event.ticketsAvailable}</td>
+                            <td>{event.ticketsSold}</td>
+                            <td>
+                              <strong>{event.remaining}</strong>
+                            </td>
+                            <td>
+                              <div className="progress-mini">
+                                <div
+                                  className="progress-fill"
+                                  style={{ width: `${Math.min(event.occupancy, 100)}%` }}
+                                ></div>
+                              </div>
+                              {event.occupancy}%
+                            </td>
+                            <td>
+                              <span className={getStockBadgeClass(event.stockStatus)}>
+                                {getStockLabel(event.stockStatus)}
+                              </span>
+                            </td>
+                            <td>
+                              {adjustingEventId === event._id ? (
+                                <div className="adjust-form">
+                                  <input
+                                    type="number"
+                                    value={adjustmentValue}
+                                    onChange={(e) =>
+                                      setAdjustmentValue(parseInt(e.target.value) || 0)
+                                    }
+                                    placeholder="+/- amount"
+                                    className="adjust-input"
+                                  />
+                                  <button
+                                    className="btn-small btn-confirm"
+                                    onClick={() => handleAdjustInventory(event._id)}
+                                  >
+                                    Save
+                                  </button>
+                                  <button
+                                    className="btn-small btn-cancel"
+                                    onClick={() => {
+                                      setAdjustingEventId(null);
+                                      setAdjustmentValue(0);
+                                    }}
+                                  >
+                                    ✕
+                                  </button>
+                                </div>
+                              ) : (
+                                <button
+                                  className="btn-small"
+                                  onClick={() => setAdjustingEventId(event._id)}
+                                >
+                                  Adjust
+                                </button>
+                              )}
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             )}
