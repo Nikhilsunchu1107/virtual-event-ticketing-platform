@@ -67,9 +67,9 @@ const Homepage = () => {
             <Link to="/events" className="btn btn-primary btn-lg">
               Explore Events
             </Link>
-            <a href="#how-it-works" className="btn btn-outline btn-lg">
+            <Link to="/events" className="btn btn-outline btn-lg">
               Learn More
-            </a>
+            </Link>
           </div>
           <div className="hero-stats">
             <div className="hero-stat">
@@ -96,31 +96,17 @@ const Homepage = () => {
           <div className="categories-grid">
             {categories.length > 0
               ? categories.map((cat) => (
-                  <Link
-                    to={`/events`}
-                    key={cat}
-                    className="category-card"
-                  >
-                    <span className="category-icon">
-                      {CATEGORY_ICONS[cat] || '🎪'}
-                    </span>
+                  <Link to="/events" key={cat} className="category-card">
+                    <span className="category-icon">{CATEGORY_ICONS[cat] || '🎪'}</span>
                     <span className="category-name">{cat}</span>
                   </Link>
                 ))
-              : ['Music', 'Technology', 'Sports', 'Comedy', 'Art', 'Theater'].map(
-                  (cat) => (
-                    <Link
-                      to={`/events`}
-                      key={cat}
-                      className="category-card"
-                    >
-                      <span className="category-icon">
-                        {CATEGORY_ICONS[cat]}
-                      </span>
-                      <span className="category-name">{cat}</span>
-                    </Link>
-                  )
-                )}
+              : ['Music', 'Technology', 'Sports', 'Comedy', 'Art', 'Theater'].map((cat) => (
+                  <Link to="/events" key={cat} className="category-card">
+                    <span className="category-icon">{CATEGORY_ICONS[cat]}</span>
+                    <span className="category-name">{cat}</span>
+                  </Link>
+                ))}
           </div>
         </div>
       </section>

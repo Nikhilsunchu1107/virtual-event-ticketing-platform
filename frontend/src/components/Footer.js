@@ -20,10 +20,10 @@ const Footer = () => {
               Your gateway to unforgettable virtual experiences. Discover, book, and enjoy events from anywhere.
             </p>
             <div className="footer-social">
-              <a href="#" className="social-link" aria-label="Instagram">📸</a>
-              <a href="#" className="social-link" aria-label="Twitter">🐦</a>
-              <a href="#" className="social-link" aria-label="Facebook">👤</a>
-              <a href="#" className="social-link" aria-label="LinkedIn">💼</a>
+              <span className="social-link" role="img" aria-label="Instagram">📸</span>
+              <span className="social-link" role="img" aria-label="Twitter">🐦</span>
+              <span className="social-link" role="img" aria-label="Facebook">👤</span>
+              <span className="social-link" role="img" aria-label="LinkedIn">💼</span>
             </div>
           </div>
 

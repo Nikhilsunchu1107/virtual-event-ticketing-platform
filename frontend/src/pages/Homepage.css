@@ -2,7 +2,6 @@
  * Homepage Styles — Dark Nightlife Theme
  */
 
-/* Hero */
 .hero {
   position: relative;
   min-height: 90vh;
@@ -12,31 +11,15 @@
   padding: 120px 0 100px;
 }
 
-.hero-bg {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-}
+.hero-bg { position: absolute; inset: 0; z-index: 0; }
 
 .hero-gradient {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(
-      ellipse at 20% 50%,
-      rgba(233, 30, 140, 0.15) 0%,
-      transparent 50%
-    ),
-    radial-gradient(
-      ellipse at 80% 20%,
-      rgba(139, 0, 255, 0.1) 0%,
-      transparent 40%
-    ),
-    radial-gradient(
-      ellipse at 50% 100%,
-      rgba(233, 30, 140, 0.08) 0%,
-      transparent 50%
-    );
+    radial-gradient(ellipse at 20% 50%, rgba(233, 30, 140, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(139, 0, 255, 0.1) 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 100%, rgba(233, 30, 140, 0.08) 0%, transparent 50%);
 }
 
 .hero-particles {
@@ -66,9 +49,7 @@
   letter-spacing: -2px;
 }
 
-.text-accent {
-  color: var(--accent);
-}
+.text-accent { color: var(--accent); }
 
 .hero-subtitle {
   font-size: 18px;
@@ -119,10 +100,7 @@
   font-weight: 500;
 }
 
-/* Categories */
-.categories-section {
-  padding: 100px 0;
-}
+.categories-section { padding: 100px 0; }
 
 .categories-grid {
   display: grid;
@@ -151,9 +129,7 @@
   transform: translateY(-4px);
 }
 
-.category-icon {
-  font-size: 36px;
-}
+.category-icon { font-size: 36px; }
 
 .category-name {
   font-size: 14px;
@@ -163,7 +139,6 @@
   letter-spacing: 1px;
 }
 
-/* Featured Events */
 .featured-section {
   padding: 100px 0;
   background: var(--surface-light);
@@ -188,10 +163,7 @@
   margin-top: 48px;
 }
 
-/* How It Works */
-.how-it-works {
-  padding: 100px 0;
-}
+.how-it-works { padding: 100px 0; }
 
 .steps-grid {
   display: grid;
@@ -226,10 +198,7 @@
   line-height: 1;
 }
 
-.step-icon {
-  font-size: 40px;
-  margin-bottom: 20px;
-}
+.step-icon { font-size: 40px; margin-bottom: 20px; }
 
 .step-title {
   font-size: 20px;
@@ -244,7 +213,6 @@
   line-height: 1.7;
 }
 
-/* CTA Banner */
 .cta-banner {
   padding: 100px 0;
   background: var(--surface-light);
@@ -290,69 +258,21 @@
   margin-right: auto;
 }
 
-/* Responsive */
 @media (max-width: 1024px) {
-  .hero-title {
-    font-size: 48px;
-  }
-
-  .steps-grid {
-    grid-template-columns: 1fr;
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
-  }
+  .hero-title { font-size: 48px; }
+  .steps-grid { grid-template-columns: 1fr; max-width: 500px; margin-left: auto; margin-right: auto; }
 }
 
 @media (max-width: 768px) {
-  .hero {
-    min-height: 70vh;
-    padding: 100px 0 60px;
-  }
-
-  .hero-title {
-    font-size: 36px;
-    letter-spacing: -1px;
-  }
-
-  .hero-subtitle {
-    font-size: 15px;
-  }
-
-  .hero-buttons {
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 40px;
-  }
-
-  .hero-stats {
-    gap: 30px;
-  }
-
-  .stat-number {
-    font-size: 24px;
-  }
-
-  .categories-section,
-  .featured-section,
-  .how-it-works,
-  .cta-banner {
-    padding: 60px 0;
-  }
-
-  .categories-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .featured-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .cta-content {
-    padding: 50px 24px;
-  }
-
-  .cta-title {
-    font-size: 28px;
-  }
+  .hero { min-height: 70vh; padding: 100px 0 60px; }
+  .hero-title { font-size: 36px; letter-spacing: -1px; }
+  .hero-subtitle { font-size: 15px; }
+  .hero-buttons { flex-direction: column; align-items: center; margin-bottom: 40px; }
+  .hero-stats { gap: 30px; }
+  .stat-number { font-size: 24px; }
+  .categories-section, .featured-section, .how-it-works, .cta-banner { padding: 60px 0; }
+  .categories-grid { grid-template-columns: repeat(2, 1fr); }
+  .featured-grid { grid-template-columns: 1fr; }
+  .cta-content { padding: 50px 24px; }
+  .cta-title { font-size: 28px; }
 }

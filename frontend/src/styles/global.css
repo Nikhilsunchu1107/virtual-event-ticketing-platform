@@ -49,7 +49,6 @@ code {
     monospace;
 }
 
-/* Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -67,14 +66,12 @@ code {
   background: var(--text-dim);
 }
 
-/* Utility Classes */
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
 }
 
-/* Buttons */
 .btn {
   padding: 10px 24px;
   border: none;
@@ -165,7 +162,6 @@ code {
   margin-top: 10px;
 }
 
-/* Alert Messages */
 .alert {
   padding: 15px 20px;
   border-radius: var(--radius);
@@ -200,7 +196,6 @@ code {
   border: 1px solid rgba(233, 30, 140, 0.3);
 }
 
-/* Loading Spinner */
 .spinner {
   border: 4px solid var(--border);
   border-top: 4px solid var(--accent);
@@ -215,7 +210,6 @@ code {
   100% { transform: rotate(360deg); }
 }
 
-/* Card */
 .card {
   background: var(--surface);
   border-radius: var(--radius);
@@ -231,7 +225,6 @@ code {
   border-color: var(--border);
 }
 
-/* Input Styles */
 input,
 textarea,
 select {
@@ -273,7 +266,6 @@ select option {
   color: var(--text);
 }
 
-/* Form Group */
 .form-group {
   margin-bottom: 20px;
 }
@@ -286,7 +278,6 @@ select option {
   font-size: 14px;
 }
 
-/* Section Label (pink uppercase) */
 .section-label {
   font-size: 12px;
   font-weight: 700;
@@ -296,7 +287,6 @@ select option {
   margin-bottom: 12px;
 }
 
-/* Section Title */
 .section-title {
   font-size: 36px;
   font-weight: 800;
@@ -305,7 +295,6 @@ select option {
   line-height: 1.2;
 }
 
-/* Loading State */
 .loading-container {
   text-align: center;
   padding: 60px 20px;
@@ -320,7 +309,6 @@ select option {
   color: var(--text-muted);
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .container {
     padding: 0 15px;

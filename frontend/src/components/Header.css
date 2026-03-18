@@ -20,7 +20,6 @@
   gap: 30px;
 }
 
-/* Logo */
 .logo {
   display: flex;
   align-items: center;
@@ -29,9 +28,7 @@
   white-space: nowrap;
 }
 
-.logo-icon {
-  font-size: 24px;
-}
+.logo-icon { font-size: 24px; }
 
 .logo-text {
   font-size: 22px;
@@ -40,11 +37,8 @@
   letter-spacing: -0.5px;
 }
 
-.logo-accent {
-  color: var(--accent);
-}
+.logo-accent { color: var(--accent); }
 
-/* Center Navigation */
 .nav-center {
   display: flex;
   align-items: center;
@@ -62,9 +56,7 @@
   position: relative;
 }
 
-.nav-link:hover {
-  color: var(--text);
-}
+.nav-link:hover { color: var(--text); }
 
 .nav-link::after {
   content: '';
@@ -77,16 +69,13 @@
   transition: width 0.3s ease;
 }
 
-.nav-link:hover::after {
-  width: 100%;
-}
+.nav-link:hover::after { width: 100%; }
 
 .nav-link.admin-link {
   color: var(--accent);
   font-weight: 700;
 }
 
-/* Right Section */
 .nav-right {
   display: flex;
   align-items: center;
@@ -104,7 +93,6 @@
   font-size: 13px;
 }
 
-/* Mobile Menu Button */
 .mobile-menu-btn {
   display: none;
   background: none;
@@ -133,33 +121,14 @@
   transition: var(--transition);
 }
 
-.hamburger::before {
-  top: -7px;
-}
+.hamburger::before { top: -7px; }
+.hamburger::after { top: 7px; }
+.hamburger.active { background: transparent; }
+.hamburger.active::before { top: 0; transform: rotate(45deg); }
+.hamburger.active::after { top: 0; transform: rotate(-45deg); }
 
-.hamburger::after {
-  top: 7px;
-}
-
-.hamburger.active {
-  background: transparent;
-}
-
-.hamburger.active::before {
-  top: 0;
-  transform: rotate(45deg);
-}
-
-.hamburger.active::after {
-  top: 0;
-  transform: rotate(-45deg);
-}
-
-/* Responsive */
 @media (max-width: 768px) {
-  .mobile-menu-btn {
-    display: block;
-  }
+  .mobile-menu-btn { display: block; }
 
   .nav-center {
     position: fixed;
@@ -176,20 +145,8 @@
     z-index: 999;
   }
 
-  .nav-center.open {
-    transform: translateX(0);
-  }
-
-  .nav-center .nav-link {
-    font-size: 20px;
-    color: var(--text);
-  }
-
-  .nav-right {
-    gap: 10px;
-  }
-
-  .user-name {
-    display: none;
-  }
+  .nav-center.open { transform: translateX(0); }
+  .nav-center .nav-link { font-size: 20px; color: var(--text); }
+  .nav-right { gap: 10px; }
+  .user-name { display: none; }
 }
