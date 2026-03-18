@@ -1,43 +1,43 @@
 /**
- * My Tickets Styles
+ * My Tickets Styles — Dark Theme
  */
 
 .my-tickets-page {
   min-height: calc(100vh - 80px);
-  padding: 40px 0;
-  background: var(--light-color);
+  padding: 60px 0 80px;
 }
 
 .my-tickets-page h1 {
   font-size: 32px;
-  color: var(--dark-color);
+  font-weight: 800;
+  color: var(--text);
   margin-bottom: 30px;
 }
 
 .no-tickets {
   text-align: center;
-  padding: 60px 20px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: var(--shadow);
+  padding: 80px 20px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-light);
 }
 
 .no-tickets p {
   font-size: 18px;
-  color: var(--text-color);
+  color: var(--text-muted);
   margin-bottom: 20px;
 }
 
 .tickets-list {
   display: flex;
   flex-direction: column;
-  gap: 25px;
+  gap: 20px;
 }
 
 .order-card {
-  background: white;
-  border-radius: 12px;
-  box-shadow: var(--shadow);
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-light);
   overflow: hidden;
 }
 
@@ -46,19 +46,20 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  border-bottom: 2px solid var(--border-color);
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  border-bottom: 1px solid var(--border-light);
+  background: linear-gradient(135deg, rgba(233, 30, 140, 0.15) 0%, rgba(139, 0, 255, 0.1) 100%);
 }
 
 .order-header h3 {
-  font-size: 20px;
-  margin-bottom: 5px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
 }
 
 .order-date {
   font-size: 13px;
-  opacity: 0.9;
+  color: var(--text-muted);
 }
 
 .order-status {
@@ -67,32 +68,35 @@
 
 .status-badge {
   display: inline-block;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 12px;
+  padding: 6px 16px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .status-confirmed {
-  background: var(--success-color);
-  color: white;
+  background: rgba(16, 185, 129, 0.15);
+  color: #6ee7b7;
+  border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
 .status-cancelled {
-  background: var(--danger-color);
-  color: white;
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
 .tickets-section {
   padding: 20px;
-  border-bottom: 2px solid var(--border-color);
+  border-bottom: 1px solid var(--border-light);
 }
 
 .tickets-section h4 {
-  font-size: 16px;
-  color: var(--dark-color);
-  margin-bottom: 15px;
+  font-size: 15px;
+  color: var(--text);
+  margin-bottom: 14px;
   font-weight: 600;
 }
 
@@ -100,10 +104,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px;
-  background: var(--light-color);
+  padding: 14px;
+  background: var(--surface-light);
   border-radius: 8px;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
+  border: 1px solid var(--border-light);
 }
 
 .ticket-item:last-child {
@@ -112,7 +117,7 @@
 
 .ticket-info {
   display: flex;
-  gap: 15px;
+  gap: 14px;
   flex: 1;
 }
 
@@ -120,40 +125,40 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 70px;
-  height: 70px;
-  background: var(--primary-color);
+  width: 60px;
+  height: 60px;
+  background: var(--accent);
   color: white;
   border-radius: 8px;
   font-weight: 700;
-  font-size: 12px;
+  font-size: 11px;
   text-align: center;
 }
 
 .ticket-details p {
-  margin: 5px 0;
+  margin: 4px 0;
   font-size: 14px;
-  color: var(--text-color);
+  color: var(--text-muted);
 }
 
 .ticket-details p strong {
-  color: var(--dark-color);
+  color: var(--text);
   font-size: 15px;
 }
 
 .ticket-code {
-  margin-top: 8px !important;
-  padding-top: 8px;
-  border-top: 1px solid var(--border-color);
+  margin-top: 6px !important;
+  padding-top: 6px;
+  border-top: 1px solid var(--border-light);
 }
 
 .ticket-code code {
-  background: white;
+  background: var(--bg);
   padding: 4px 8px;
   border-radius: 4px;
   font-family: 'Courier New', monospace;
   font-size: 12px;
-  color: var(--primary-color);
+  color: var(--accent);
   font-weight: 600;
 }
 
@@ -163,53 +168,60 @@
   white-space: nowrap;
 }
 
-.order-summary {
+.my-tickets-page .order-summary {
   padding: 20px;
-  background: var(--light-color);
+  background: var(--surface-light);
   display: flex;
   justify-content: space-around;
+  border-top: 1px solid var(--border-light);
 }
 
-.summary-item {
+.my-tickets-page .summary-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
+  margin-bottom: 0;
 }
 
-.summary-item span:first-child {
-  font-size: 12px;
-  color: var(--text-color);
+.my-tickets-page .summary-item span:first-child {
+  font-size: 11px;
+  color: var(--text-dim);
   text-transform: uppercase;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: 1px;
 }
 
-.summary-item .amount {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--primary-color);
+.my-tickets-page .summary-item .amount {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--accent);
 }
 
 .status-completed {
-  color: var(--success-color);
+  color: var(--success-color) !important;
   font-weight: 600;
 }
 
 .status-pending {
-  color: var(--warning-color);
+  color: var(--warning-color) !important;
   font-weight: 600;
 }
 
 .status-failed {
-  color: var(--danger-color);
+  color: var(--danger-color) !important;
   font-weight: 600;
 }
 
 @media (max-width: 768px) {
+  .my-tickets-page {
+    padding: 40px 0 60px;
+  }
+
   .order-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 15px;
+    gap: 12px;
   }
 
   .order-status {
@@ -226,8 +238,8 @@
     margin-top: 10px;
   }
 
-  .order-summary {
+  .my-tickets-page .order-summary {
     flex-direction: column;
-    gap: 15px;
+    gap: 14px;
   }
 }

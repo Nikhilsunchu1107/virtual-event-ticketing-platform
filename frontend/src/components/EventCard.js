@@ -1,5 +1,5 @@
 /**
- * Event Card Component
+ * Event Card Component — Dark Theme
  */
 
 import React from 'react';
@@ -13,6 +13,7 @@ const EventCard = ({ event }) => {
     <div className="event-card">
       <div className="event-image">
         <img src={event.bannerImage} alt={event.title} />
+        <div className="event-image-overlay"></div>
         <div className="event-badge">
           {availableTickets > 0 ? (
             <span className="badge-available">{availableTickets} available</span>

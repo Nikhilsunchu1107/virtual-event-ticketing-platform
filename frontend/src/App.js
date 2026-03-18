@@ -7,8 +7,10 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Header from './components/Header';
+import Footer from './components/Footer';
 
 // Pages
+import Homepage from './pages/Homepage';
 import EventList from './pages/EventList';
 import EventDetails from './pages/EventDetails';
 import Login from './pages/Login';
@@ -18,6 +20,7 @@ import Checkout from './pages/Checkout';
 import OrderConfirmation from './pages/OrderConfirmation';
 import MyTickets from './pages/MyTickets';
 import AdminDashboard from './pages/AdminDashboard';
+import Contact from './pages/Contact';
 
 // Styles
 import './styles/global.css';
@@ -58,10 +61,12 @@ function AppContent() {
       <Header />
       <Routes>
         {/* Public Routes */}
-        <Route path="/" element={<EventList />} />
+        <Route path="/" element={<Homepage />} />
+        <Route path="/events" element={<EventList />} />
         <Route path="/event/:id" element={<EventDetails />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/contact" element={<Contact />} />
 
         {/* Protected Routes */}
         <Route
@@ -110,6 +115,7 @@ function AppContent() {
         {/* 404 Route */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
+      <Footer />
     </>
   );
 }

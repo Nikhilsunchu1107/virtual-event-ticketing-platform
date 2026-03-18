@@ -1,11 +1,10 @@
 /**
- * Event Details Styles
+ * Event Details Styles — Dark Theme
  */
 
 .event-details-page {
   min-height: calc(100vh - 80px);
-  padding: 40px 0;
-  background: var(--light-color);
+  padding: 40px 0 80px;
 }
 
 .back-btn {
@@ -14,16 +13,17 @@
 
 .event-details-content {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 40px;
+  grid-template-columns: 1.8fr 1fr;
+  gap: 30px;
   align-items: start;
 }
 
 /* Left Column */
 .details-left {
-  background: white;
-  border-radius: 12px;
+  background: var(--surface);
+  border-radius: var(--radius);
   overflow: hidden;
+  border: 1px solid var(--border-light);
 }
 
 .event-banner {
@@ -38,7 +38,8 @@
 
 .event-info-section h2 {
   font-size: 32px;
-  color: var(--dark-color);
+  font-weight: 800;
+  color: var(--text);
   margin-bottom: 20px;
   line-height: 1.2;
 }
@@ -46,20 +47,21 @@
 .event-meta-details {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 15px;
+  gap: 14px;
   margin-bottom: 30px;
   padding: 20px;
-  background: var(--light-color);
+  background: var(--surface-light);
   border-radius: 8px;
+  border: 1px solid var(--border-light);
 }
 
 .meta-item {
   font-size: 14px;
-  color: var(--text-color);
+  color: var(--text-muted);
 }
 
 .meta-item strong {
-  color: var(--dark-color);
+  color: var(--text);
   display: block;
   margin-bottom: 4px;
 }
@@ -70,14 +72,15 @@
 
 .event-description-section h3 {
   font-size: 20px;
-  color: var(--dark-color);
+  color: var(--text);
   margin-bottom: 15px;
+  font-weight: 700;
 }
 
 .event-description-section p {
-  color: var(--text-color);
-  line-height: 1.6;
-  font-size: 16px;
+  color: var(--text-muted);
+  line-height: 1.8;
+  font-size: 15px;
 }
 
 /* Right Column */
@@ -85,34 +88,38 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  position: sticky;
+  top: 100px;
 }
 
 .pricing-card {
-  background: white;
-  border-radius: 12px;
+  background: var(--surface);
+  border-radius: var(--radius);
   padding: 30px;
-  box-shadow: var(--shadow);
+  border: 1px solid var(--border-light);
 }
 
 .price-section {
   text-align: center;
   margin-bottom: 25px;
   padding-bottom: 25px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-light);
 }
 
 .price-label {
   display: block;
-  font-size: 14px;
-  color: var(--text-color);
-  margin-bottom: 10px;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .price-value {
   display: block;
-  font-size: 40px;
-  font-weight: 700;
-  color: var(--primary-color);
+  font-size: 44px;
+  font-weight: 800;
+  color: var(--accent);
 }
 
 .availability-section {
@@ -120,7 +127,7 @@
 }
 
 .availability-info {
-  margin-bottom: 15px;
+  margin-bottom: 12px;
 }
 
 .available-count {
@@ -132,37 +139,39 @@
 
 .progress-bar {
   width: 100%;
-  height: 8px;
-  background: var(--light-color);
-  border-radius: 4px;
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
   overflow: hidden;
   margin-bottom: 8px;
 }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  background: linear-gradient(90deg, var(--accent), #FF1493);
   transition: width 0.3s ease;
+  border-radius: 3px;
 }
 
 .progress-text {
   font-size: 12px;
-  color: var(--text-color);
+  color: var(--text-dim);
   text-align: center;
 }
 
 .quantity-section {
   margin: 25px 0;
   padding: 20px 0;
-  border-top: 1px solid var(--border-color);
-  border-bottom: 1px solid var(--border-color);
+  border-top: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
 }
 
 .quantity-section label {
   display: block;
   font-weight: 600;
   margin-bottom: 12px;
-  color: var(--dark-color);
+  color: var(--text);
+  font-size: 14px;
 }
 
 .quantity-input {
@@ -174,25 +183,27 @@
 .quantity-btn {
   width: 40px;
   height: 40px;
-  border: 1px solid var(--border-color);
-  background: var(--light-color);
+  border: 1px solid var(--border);
+  background: var(--surface-light);
+  color: var(--text);
   cursor: pointer;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 18px;
-  transition: all 0.3s;
+  transition: var(--transition);
+  font-family: 'Inter', sans-serif;
 }
 
 .quantity-btn:hover {
-  background: var(--primary-color);
+  background: var(--accent);
   color: white;
-  border-color: var(--primary-color);
+  border-color: var(--accent);
 }
 
 .quantity-input input {
   flex: 1;
   text-align: center;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .total-section {
@@ -200,54 +211,55 @@
   justify-content: space-between;
   align-items: center;
   margin: 25px 0;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
-  color: var(--dark-color);
+  color: var(--text);
 }
 
 .total-price {
-  color: var(--primary-color);
-  font-size: 24px;
+  color: var(--accent);
+  font-size: 28px;
+  font-weight: 800;
 }
 
 .btn-large {
   width: 100%;
-  padding: 14px;
+  padding: 16px;
   font-size: 16px;
   margin-top: 10px;
 }
 
 .organizer-card {
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: var(--shadow);
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 24px;
+  border: 1px solid var(--border-light);
 }
 
 .organizer-card h4 {
-  font-size: 14px;
-  color: var(--text-color);
+  font-size: 12px;
+  color: var(--text-dim);
   margin-bottom: 10px;
   text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .organizer-card p {
   font-size: 16px;
   font-weight: 600;
-  color: var(--dark-color);
-  margin-bottom: 5px;
+  color: var(--text);
+  margin-bottom: 4px;
 }
 
 .organizer-email {
   font-size: 13px;
-  color: var(--text-color) !important;
+  color: var(--text-muted) !important;
   font-weight: 400 !important;
 }
 
-.loading-container,
 .error-container {
   text-align: center;
-  padding: 60px 20px;
+  padding: 80px 20px;
 }
 
 .error-container p {
@@ -259,7 +271,11 @@
 @media (max-width: 1024px) {
   .event-details-content {
     grid-template-columns: 1fr;
-    gap: 25px;
+    gap: 24px;
+  }
+
+  .details-right {
+    position: static;
   }
 
   .event-banner {
@@ -273,11 +289,11 @@
 
 @media (max-width: 768px) {
   .event-details-page {
-    padding: 20px 0;
+    padding: 20px 0 60px;
   }
 
   .event-info-section {
-    padding: 15px;
+    padding: 20px;
   }
 
   .event-meta-details {
@@ -289,10 +305,6 @@
   }
 
   .price-value {
-    font-size: 32px;
-  }
-
-  .event-description-section h3 {
-    font-size: 18px;
+    font-size: 36px;
   }
 }

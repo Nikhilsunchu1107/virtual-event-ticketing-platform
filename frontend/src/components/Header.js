@@ -1,8 +1,8 @@
 /**
- * Navigation Header Component
+ * Navigation Header Component — Dark Theme
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Header.css';
@@ -10,6 +10,7 @@ import './Header.css';
 const Header = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -21,28 +22,43 @@ const Header = () => {
       <div className="container">
         <nav className="nav">
           <Link to="/" className="logo">
-            🎫 EventTickets
+            <span className="logo-icon">⚡</span>
+            <span className="logo-text">Event<span className="logo-accent">Vibe</span></span>
           </Link>
 
-          <div className="nav-links">
-            <Link to="/" className="nav-link">
-              Browse Events
+          <button
+            className="mobile-menu-btn"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            <span className={`hamburger ${mobileMenuOpen ? 'active' : ''}`}></span>
+          </button>
+
+          <div className={`nav-center ${mobileMenuOpen ? 'open' : ''}`}>
+            <Link to="/" className="nav-link" onClick={() => setMobileMenuOpen(false)}>
+              Home
+            </Link>
+            <Link to="/events" className="nav-link" onClick={() => setMobileMenuOpen(false)}>
+              Events
+            </Link>
+            <Link to="/contact" className="nav-link" onClick={() => setMobileMenuOpen(false)}>
+              Contact
             </Link>
 
             {isAuthenticated && (
               <>
-                <Link to="/cart" className="nav-link">
+                <Link to="/cart" className="nav-link" onClick={() => setMobileMenuOpen(false)}>
                   🛒 Cart
                 </Link>
-                <Link to="/my-tickets" className="nav-link">
+                <Link to="/my-tickets" className="nav-link" onClick={() => setMobileMenuOpen(false)}>
                   🎟️ My Tickets
                 </Link>
               </>
             )}
 
             {user?.isAdmin && (
-              <Link to="/admin" className="nav-link admin-link">
-                ⚙️ Admin Dashboard
+              <Link to="/admin" className="nav-link admin-link" onClick={() => setMobileMenuOpen(false)}>
+                ⚙️ Admin
               </Link>
             )}
           </div>
@@ -51,20 +67,17 @@ const Header = () => {
             {isAuthenticated ? (
               <>
                 <span className="user-name">👤 {user?.name}</span>
-                <Link to="/profile" className="nav-link">
-                  Profile
-                </Link>
-                <button onClick={handleLogout} className="btn btn-danger">
+                <button onClick={handleLogout} className="btn btn-outline btn-sm">
                   Logout
                 </button>
               </>
             ) : (
               <>
-                <Link to="/login" className="btn btn-outline">
+                <Link to="/login" className="nav-link">
                   Login
                 </Link>
-                <Link to="/register" className="btn btn-primary">
-                  Sign Up
+                <Link to="/events" className="btn btn-primary btn-sm">
+                  Get Tickets
                 </Link>
               </>
             )}
