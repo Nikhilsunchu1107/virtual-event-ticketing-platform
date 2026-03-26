@@ -6,7 +6,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import cartService from '../services/cartService';
-import './Cart.css';
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -63,65 +62,74 @@ const Cart = () => {
 
   if (loading) {
     return (
-      <div className="cart-page">
-        <div className="container">
-          <div className="loading-container">
-            <div className="spinner"></div>
-            <p>Loading cart...</p>
-          </div>
-        </div>
+      <div className="flex flex-col items-center gap-4 px-6 py-24 text-slate-400">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-border-dark border-t-primary"></div>
+        <p>Loading cart...</p>
       </div>
     );
   }
 
   return (
-    <div className="cart-page">
-      <div className="container">
-        <h1>🛒 Shopping Cart</h1>
+    <div className="px-6 py-12">
+      <div className="mx-auto max-w-[1200px]">
+        <h1 className="mb-6 text-4xl font-black text-white">Shopping Cart</h1>
 
-        {error && <div className="alert alert-error">{error}</div>}
+        {error && (
+          <div className="mb-6 rounded-lg border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+            {error}
+          </div>
+        )}
 
         {!cart || cart.items.length === 0 ? (
-          <div className="empty-cart">
-            <p>Your cart is empty</p>
-            <Link to="/" className="btn btn-primary">
+          <div className="rounded-2xl border border-white/10 bg-surface p-10 text-center">
+            <p className="mb-4 text-slate-300">Your cart is empty</p>
+            <Link to="/" className="rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-white">
               Continue Shopping
             </Link>
           </div>
         ) : (
-          <div className="cart-content">
-            <div className="cart-items">
+          <div className="grid gap-8 lg:grid-cols-3">
+            <div className="space-y-4 lg:col-span-2">
               {cart.items.map((item) => (
-                <div key={item.event._id} className="cart-item">
-                  <img src={item.event.bannerImage} alt={item.event.title} />
-                  <div className="item-details">
-                    <h3>{item.event.title}</h3>
-                    <p className="item-date">
-                      📅 {new Date(item.event.eventDate).toLocaleDateString()}
+                <div
+                  key={item.event._id}
+                  className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-surface p-5 md:flex-row md:items-center"
+                >
+                  <img
+                    src={item.event.bannerImage}
+                    alt={item.event.title}
+                    className="h-28 w-full rounded-xl object-cover md:w-40"
+                  />
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-white">{item.event.title}</h3>
+                    <p className="mt-1 text-sm text-slate-400">
+                      {new Date(item.event.eventDate).toLocaleDateString()}
                     </p>
-                    <p className="item-price">₹{item.price} per ticket</p>
+                    <p className="text-sm text-slate-300">₹{item.price} per ticket</p>
                   </div>
-                  <div className="item-quantity">
+
+                  <div className="flex items-center gap-3">
                     <button
                       onClick={() => handleUpdateQuantity(item.event._id, item.quantity - 1)}
-                      className="qty-btn"
+                      className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-black/40 text-lg text-white"
                     >
                       −
                     </button>
-                    <span>{item.quantity}</span>
+                    <span className="min-w-6 text-center font-bold text-white">{item.quantity}</span>
                     <button
                       onClick={() => handleUpdateQuantity(item.event._id, item.quantity + 1)}
-                      className="qty-btn"
+                      className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-black/40 text-lg text-white"
                     >
                       +
                     </button>
                   </div>
-                  <div className="item-total">
-                    <p className="total-price">₹{item.price * item.quantity}</p>
+                  <div className="text-right">
+                    <p className="text-lg font-black text-primary">₹{item.price * item.quantity}</p>
                   </div>
+
                   <button
                     onClick={() => handleRemoveItem(item.event._id)}
-                    className="btn btn-danger remove-btn"
+                    className="rounded-full border border-red-400/30 px-4 py-2 text-sm font-semibold text-red-300 transition-colors hover:bg-red-500/10"
                   >
                     Remove
                   </button>
@@ -129,24 +137,30 @@ const Cart = () => {
               ))}
             </div>
 
-            <div className="cart-summary">
-              <h2>Order Summary</h2>
-              <div className="summary-item">
+            <div className="h-fit rounded-2xl border border-white/10 bg-surface p-6 lg:sticky lg:top-28">
+              <h2 className="mb-4 text-2xl font-bold text-white">Order Summary</h2>
+              <div className="mb-3 flex items-center justify-between text-sm text-slate-300">
                 <span>Subtotal ({cart.items.reduce((sum, item) => sum + item.quantity, 0)} tickets)</span>
                 <span>₹{cart.totalPrice.toFixed(2)}</span>
               </div>
-              <div className="summary-item">
+              <div className="mb-3 flex items-center justify-between text-sm text-slate-400">
                 <span>Taxes</span>
                 <span>Calculated at checkout</span>
               </div>
-              <div className="summary-total">
+              <div className="mb-6 flex items-center justify-between border-t border-white/10 pt-4 text-lg font-bold text-white">
                 <span>Total</span>
                 <span>₹{cart.totalPrice.toFixed(2)}</span>
               </div>
-              <button onClick={handleCheckout} className="btn btn-primary btn-full">
+              <button
+                onClick={handleCheckout}
+                className="mb-3 w-full rounded-full bg-primary px-6 py-3 font-bold text-white"
+              >
                 Proceed to Checkout
               </button>
-              <Link to="/" className="btn btn-outline btn-full">
+              <Link
+                to="/"
+                className="block w-full rounded-full border border-white/20 px-6 py-3 text-center font-bold text-white"
+              >
                 Continue Shopping
               </Link>
             </div>

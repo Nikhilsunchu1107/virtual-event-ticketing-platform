@@ -22,17 +22,14 @@ import MyTickets from './pages/MyTickets';
 import AdminDashboard from './pages/AdminDashboard';
 import Contact from './pages/Contact';
 
-// Styles
-import './styles/global.css';
-
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', padding: '100px 20px' }}>
-        <div className="spinner"></div>
+      <div className="flex justify-center px-5 py-24">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-border-dark border-t-primary"></div>
       </div>
     );
   }
@@ -46,8 +43,8 @@ const AdminRoute = ({ children }) => {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', padding: '100px 20px' }}>
-        <div className="spinner"></div>
+      <div className="flex justify-center px-5 py-24">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-border-dark border-t-primary"></div>
       </div>
     );
   }

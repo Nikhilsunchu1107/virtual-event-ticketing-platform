@@ -1,14 +1,9 @@
-/**
- * Checkout Page
- */
-
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import cartService from '../services/cartService';
 import orderService from '../services/orderService';
 import paymentService from '../services/paymentService';
-import './Checkout.css';
 
 const loadRazorpayScript = () => {
   return new Promise((resolve) => {
@@ -42,36 +37,41 @@ const Checkout = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [paymentStatus, setPaymentStatus] = useState('');
+  const [cart, setCart] = useState(null);
 
   useEffect(() => {
     loadRazorpayScript();
+    fetchCart();
   }, []);
+
+  const fetchCart = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (token) {
+        const cartData = await cartService.getCart(token);
+        setCart(cartData.cart);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const [formData, setFormData] = useState({
     attendeeName: user?.name || '',
     attendeeEmail: user?.email || '',
     attendeePhone: '',
-    billingAddress: {
-      street: '',
-      city: '',
-      state: '',
-      postalCode: '',
-      country: '',
-    },
-    paymentMethod: 'razorpay',
+    street: '',
+    city: '',
+    stateZip: '',
+    country: 'India',
   });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    if (name.startsWith('billing_')) {
-      const field = name.replace('billing_', '');
-      setFormData((prev) => ({
-        ...prev,
-        billingAddress: { ...prev.billingAddress, [field]: value },
-      }));
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    }
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -114,7 +114,16 @@ const Checkout = () => {
             setPaymentStatus('Payment verified! Creating order...');
 
             const checkoutPayload = {
-              ...formData,
+              attendeeName: formData.attendeeName,
+              attendeeEmail: formData.attendeeEmail,
+              attendeePhone: formData.attendeePhone,
+              billingAddress: {
+                street: formData.street,
+                city: formData.city,
+                state: formData.stateZip,
+                postalCode: formData.stateZip,
+                country: formData.country,
+              },
               paymentMethod: 'razorpay',
               razorpayPaymentId: response.razorpay_payment_id,
               razorpayOrderId: response.razorpay_order_id,
@@ -135,7 +144,7 @@ const Checkout = () => {
           contact: formData.attendeePhone,
         },
         theme: {
-          color: '#2b5eb7',
+          color: '#e9208f',
         },
         modal: {
           ondismiss: function () {
@@ -160,136 +169,256 @@ const Checkout = () => {
     }
   };
 
+  const orderTotal = cart?.items?.reduce((total, item) => total + (item.price * item.quantity), 0) || 0;
+
   return (
-    <div className="checkout-page">
-      <div className="container">
-        <h1>🛍️ Checkout</h1>
+    <div>
+      <main className="mx-auto max-w-[1200px] px-6 py-10">
+        <div className="mb-8">
+          <nav className="mb-4 flex items-center gap-2 text-sm text-slate-400">
+            <Link to="/events" className="transition-colors hover:text-primary">
+              Events
+            </Link>
+            <span className="material-symbols-outlined text-xs">chevron_right</span>
+            <span className="text-white">Checkout</span>
+          </nav>
+          <span className="mb-2 block text-xs font-black uppercase tracking-[0.2em] text-primary">
+            Checkout
+          </span>
+          <h1 className="text-4xl font-black text-white md:text-5xl">Complete Your Order</h1>
+        </div>
 
-        {error && <div className="alert alert-error">{error}</div>}
-
-        <form onSubmit={handleSubmit} className="checkout-form">
-          <div className="checkout-left">
-            {/* Attendee Information */}
-            <section className="form-section">
-              <h2>Attendee Information</h2>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Full Name *</label>
-                  <input
-                    type="text"
-                    name="attendeeName"
-                    value={formData.attendeeName}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Email Address *</label>
-                  <input
-                    type="email"
-                    name="attendeeEmail"
-                    value={formData.attendeeEmail}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-              </div>
-              <div className="form-group">
-                <label>Phone Number</label>
-                <input
-                  type="tel"
-                  name="attendeePhone"
-                  value={formData.attendeePhone}
-                  onChange={handleInputChange}
-                />
-              </div>
-            </section>
-
-            {/* Billing Address */}
-            <section className="form-section">
-              <h2>Billing Address</h2>
-              <div className="form-group">
-                <label>Street Address *</label>
-                <input
-                  type="text"
-                  name="billing_street"
-                  value={formData.billingAddress.street}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>City *</label>
-                  <input
-                    type="text"
-                    name="billing_city"
-                    value={formData.billingAddress.city}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>State/Province</label>
-                  <input
-                    type="text"
-                    name="billing_state"
-                    value={formData.billingAddress.state}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Postal Code *</label>
-                  <input
-                    type="text"
-                    name="billing_postalCode"
-                    value={formData.billingAddress.postalCode}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Country *</label>
-                  <input
-                    type="text"
-                    name="billing_country"
-                    value={formData.billingAddress.country}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-              </div>
-            </section>
-
-            {/* Payment Method */}
-            <section className="form-section">
-              <h2>Payment Method</h2>
-              <p>Razorpay (UPI, Cards, Netbanking, Wallets)</p>
-            </section>
+        <div className="relative mb-12 flex max-w-2xl items-center justify-between">
+          <div className="absolute left-0 top-5 -z-0 h-[2px] w-full bg-input-border">
+            <div className="h-full w-1/2 bg-primary"></div>
           </div>
+          <div className="z-10 flex flex-col items-center gap-2">
+            <div className="flex size-10 items-center justify-center rounded-full bg-primary text-white">
+              <span className="material-symbols-outlined">check</span>
+            </div>
+            <span className="text-sm font-bold text-primary">Details</span>
+          </div>
+          <div className="z-10 flex flex-col items-center gap-2">
+            <div className="flex size-10 items-center justify-center rounded-full border-4 border-background-dark bg-primary text-white">
+              <span className="text-sm font-bold">2</span>
+            </div>
+            <span className="text-sm font-bold text-primary">Payment</span>
+          </div>
+          <div className="z-10 flex flex-col items-center gap-2">
+            <div className="flex size-10 items-center justify-center rounded-full border border-input-border bg-surface text-slate-500">
+              <span className="text-sm font-bold">3</span>
+            </div>
+            <span className="text-sm font-bold text-slate-500">Confirmation</span>
+          </div>
+        </div>
 
-          <div className="checkout-right">
-            <div className="order-summary">
-              <h2>Order Summary</h2>
-              <p className="summary-note">Items will be shown after cart is loaded</p>
-              <button
-                type="submit"
-                disabled={loading}
-                className="btn btn-primary btn-full"
-              >
-                {loading ? 'Processing...' : '✓ Complete Purchase'}
-              </button>
-              {loading && paymentStatus && (
-                <p className="payment-status-message" style={{ marginTop: '15px', fontSize: '14px', color: 'var(--primary-color)', textAlign: 'center', fontWeight: '500' }}>
-                  {paymentStatus}
+        {error && (
+          <div className="mb-6 rounded-lg border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+            {error}
+          </div>
+        )}
+        
+        {paymentStatus && (
+           <div className="mb-6 rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
+             {paymentStatus}
+           </div>
+        )}
+
+        <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-12">
+          <div className="space-y-6 lg:col-span-7">
+            <div className="rounded-2xl border border-input-border bg-surface p-8">
+              <form onSubmit={handleSubmit}>
+                <div className="mb-10">
+                  <div className="mb-6 flex items-center gap-2">
+                     <span className="material-symbols-outlined text-primary">person</span>
+                     <h2 className="text-xl font-bold text-white">Contact Information</h2>
+                  </div>
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div className="col-span-2">
+                      <label className="mb-2 block text-xs font-bold uppercase text-slate-400">
+                        Full Name
+                      </label>
+                      <input
+                        className="w-full rounded-lg border border-white/10 bg-black/40 px-4 py-3 text-white outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
+                        type="text"
+                        name="attendeeName"
+                        value={formData.attendeeName}
+                        onChange={handleInputChange}
+                        placeholder="John Doe"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-xs font-bold uppercase text-slate-400">
+                        Email Address
+                      </label>
+                      <input
+                        className="w-full rounded-lg border border-white/10 bg-black/40 px-4 py-3 text-white outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
+                        type="email"
+                        name="attendeeEmail"
+                        value={formData.attendeeEmail}
+                        onChange={handleInputChange}
+                        placeholder="john@example.com"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-xs font-bold uppercase text-slate-400">
+                        Phone Number
+                      </label>
+                      <input
+                        className="w-full rounded-lg border border-white/10 bg-black/40 px-4 py-3 text-white outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
+                        type="tel"
+                        name="attendeePhone"
+                        value={formData.attendeePhone}
+                        onChange={handleInputChange}
+                        placeholder="+1 (555) 000-0000"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mb-8">
+                  <div className="mb-6 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary">location_on</span>
+                    <h2 className="text-xl font-bold text-white">Billing Address</h2>
+                  </div>
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                    <div className="md:col-span-3">
+                      <label className="mb-2 block text-xs font-bold uppercase text-slate-400">
+                        Street Address
+                      </label>
+                      <input
+                        className="w-full rounded-lg border border-white/10 bg-black/40 px-4 py-3 text-white outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
+                        type="text"
+                        name="street"
+                        value={formData.street}
+                        onChange={handleInputChange}
+                        placeholder="123 Event St"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-xs font-bold uppercase text-slate-400">
+                        City
+                      </label>
+                      <input
+                        className="w-full rounded-lg border border-white/10 bg-black/40 px-4 py-3 text-white outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
+                        type="text"
+                        name="city"
+                        value={formData.city}
+                        onChange={handleInputChange}
+                        placeholder="New York"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-xs font-bold uppercase text-slate-400">
+                        State / Zip
+                      </label>
+                      <input
+                        className="w-full rounded-lg border border-white/10 bg-black/40 px-4 py-3 text-white outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
+                        type="text"
+                        name="stateZip"
+                        value={formData.stateZip}
+                        onChange={handleInputChange}
+                        placeholder="NY 10001"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-xs font-bold uppercase text-slate-400">
+                        Country
+                      </label>
+                      <input
+                        className="w-full rounded-lg border border-white/10 bg-black/40 px-4 py-3 text-white outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
+                        type="text"
+                        name="country"
+                        value={formData.country}
+                        onChange={handleInputChange}
+                        placeholder="India"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mb-6 flex items-center gap-2">
+                   <span className="material-symbols-outlined text-primary">payments</span>
+                   <h2 className="text-xl font-bold text-white">Payment Method</h2>
+                </div>
+                <div className="mb-8 rounded-lg border border-primary/40 bg-primary/10 p-4 text-center">
+                    <p className="text-slate-300">Proceed to standard checkout via Razorpay (UPI, Credit Cards, Wallets securely supported)</p>
+                </div>
+
+                <button
+                  className="mb-4 w-full rounded-full bg-primary py-4 text-lg font-black text-white shadow-[0_0_20px_rgba(233,32,143,0.3)] transition-all hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+                  type="submit"
+                  disabled={loading}
+                >
+                  {loading ? 'Processing...' : `Pay ₹${orderTotal.toFixed(2)}`}
+                </button>
+
+                <p className="flex items-center justify-center gap-2 text-center text-sm text-slate-500">
+                  <span className="material-symbols-outlined text-xs">lock</span>
+                  Your payment is secured with 256-bit SSL encryption via Razorpay
                 </p>
-              )}
+              </form>
             </div>
           </div>
-        </form>
-      </div>
+
+          <div className="sticky top-28 lg:col-span-5">
+            <div className="overflow-hidden rounded-2xl border border-input-border bg-surface">
+              <div className="p-8">
+                <h2 className="mb-6 text-2xl font-bold text-white">Order Summary</h2>
+                {cart && cart.items.length > 0 ? (
+                  <div className="mb-8 space-y-4 border-b border-input-border pb-8">
+                    {cart.items.map((item, idx) => (
+                      <div key={idx} className="flex flex-col gap-2">
+                         <div className="flex items-center justify-between">
+                           <span className="text-slate-400">{item.event?.title || 'General Admission'} x{item.quantity}</span>
+                           <span className="font-medium text-white">₹{(item.price * item.quantity).toFixed(2)}</span>
+                         </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="mb-8 text-slate-500">Cart is empty.</p>
+                )}
+
+                <div className="mb-8 space-y-3">
+                  <div className="flex items-center justify-between pt-4">
+                    <span className="text-xl font-bold text-white">Total</span>
+                    <span className="text-3xl font-black text-primary">₹{orderTotal.toFixed(2)}</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="flex flex-col items-center rounded-xl border border-input-border bg-input-fill/50 p-3 text-center">
+                    <span className="material-symbols-outlined mb-1 text-xl text-primary">verified_user</span>
+                    <span className="text-[10px] font-bold uppercase leading-tight text-slate-400">
+                      Secure Payment
+                    </span>
+                  </div>
+                  <div className="flex flex-col items-center rounded-xl border border-input-border bg-input-fill/50 p-3 text-center">
+                    <span className="material-symbols-outlined mb-1 text-xl text-primary">payments</span>
+                    <span className="text-[10px] font-bold uppercase leading-tight text-slate-400">
+                      Razorpay
+                    </span>
+                  </div>
+                  <div className="flex flex-col items-center rounded-xl border border-input-border bg-input-fill/50 p-3 text-center">
+                    <span className="material-symbols-outlined mb-1 text-xl text-primary">send_to_mobile</span>
+                    <span className="text-[10px] font-bold uppercase leading-tight text-slate-400">
+                      Instant Delivery
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
   );
 };

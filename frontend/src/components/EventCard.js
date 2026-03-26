@@ -4,49 +4,68 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import './EventCard.css';
 
 const EventCard = ({ event }) => {
   const availableTickets = event.ticketsAvailable - event.ticketsSold;
+  const eventDate = new Date(event.eventDate).toLocaleDateString();
+  const soldOut = availableTickets <= 0;
 
   return (
-    <div className="event-card">
-      <div className="event-image">
-        <img src={event.bannerImage} alt={event.title} />
-        <div className="event-image-overlay"></div>
-        <div className="event-badge">
-          {availableTickets > 0 ? (
-            <span className="badge-available">{availableTickets} available</span>
+    <div className="group flex flex-col overflow-hidden rounded-2xl border border-white/5 bg-surface transition-all hover:-translate-y-1 hover:border-primary/30 hover:shadow-[0_0_30px_rgba(233,32,143,0.15)]">
+      <div className="relative h-56 overflow-hidden">
+        <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+        <img
+          src={event.bannerImage}
+          alt={event.title}
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+        />
+        <div className="absolute right-4 top-4 z-20">
+          {soldOut ? (
+            <span className="rounded-full bg-slate-600 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white">
+              Sold Out
+            </span>
           ) : (
-            <span className="badge-sold-out">Sold Out</span>
+            <span className="rounded-full bg-primary px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white">
+              {availableTickets <= 10 ? 'Last Few' : 'Available'}
+            </span>
           )}
         </div>
       </div>
 
-      <div className="event-content">
-        <div className="event-category">{event.category}</div>
-        <h3 className="event-title">{event.title}</h3>
-        <p className="event-description">{event.description.substring(0, 100)}...</p>
+      <div className="flex flex-1 flex-col p-6">
+        <p className="mb-1 text-[10px] font-black uppercase tracking-widest text-primary">{event.category}</p>
+        <h3 className="mb-2 text-xl font-bold text-white transition-colors group-hover:text-primary">
+          {event.title}
+        </h3>
+        <p className="mb-4 text-sm text-slate-400">{event.description?.substring(0, 100)}...</p>
 
-        <div className="event-meta">
-          <div className="meta-item">
-            📅 {new Date(event.eventDate).toLocaleDateString()}
-          </div>
-          <div className="meta-item">
-            🕐 {event.eventTime}
-          </div>
+        <div className="mb-1 flex items-center gap-2 text-sm text-slate-400">
+          <span className="material-symbols-outlined text-sm">calendar_today</span>
+          <span>
+            {eventDate} {event.eventTime ? `• ${event.eventTime}` : ''}
+          </span>
+        </div>
+        <div className="mb-4 flex items-center gap-2 text-sm text-slate-400">
+          <span className="material-symbols-outlined text-sm">location_on</span>
+          <span>{event.location || 'Virtual Event'}</span>
         </div>
 
         {event.speaker && (
-          <div className="event-speaker">
+          <div className="mb-2 flex items-center gap-2 text-sm text-slate-400">
             <span>🎤 {event.speaker}</span>
           </div>
         )}
 
-        <div className="event-footer">
-          <span className="event-price">₹{event.price}</span>
-          <Link to={`/event/${event._id}`} className="btn btn-primary">
-            View Details
+        <div className="mt-auto flex items-center justify-between">
+          <p className={`text-lg font-black ${soldOut ? 'text-slate-500' : 'text-primary'}`}>
+            {soldOut ? 'Sold Out' : `₹${event.price}`}
+          </p>
+          <Link
+            to={`/event/${event._id}`}
+            className="inline-flex items-center gap-1 text-sm font-bold text-slate-300 transition-colors hover:text-primary"
+          >
+            Details
+            <span className="material-symbols-outlined text-base">arrow_forward</span>
           </Link>
         </div>
       </div>

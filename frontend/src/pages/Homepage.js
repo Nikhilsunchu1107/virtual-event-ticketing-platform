@@ -1,30 +1,23 @@
-/**
- * Homepage — Hero, Categories, Featured Events, How It Works, CTA
- */
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import eventService from '../services/eventService';
-import EventCard from '../components/EventCard';
-import './Homepage.css';
 
 const CATEGORY_ICONS = {
-  Music: '🎵',
-  Technology: '💻',
-  Sports: '⚽',
-  Comedy: '😂',
-  Art: '🎨',
-  Theater: '🎭',
-  Workshop: '🔧',
-  Conference: '🎤',
-  Gaming: '🎮',
-  Networking: '🤝',
+  Music: 'music_note',
+  Technology: 'memory',
+  Sports: 'sports_kabaddi',
+  Comedy: 'mood',
+  Art: 'palette',
+  Theater: 'theater_comedy',
+  Workshop: 'build',
+  Conference: 'groups',
+  Gaming: 'sports_esports',
+  Networking: 'handshake',
 };
 
 const Homepage = () => {
   const [featuredEvents, setFeaturedEvents] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,158 +30,217 @@ const Homepage = () => {
         setCategories(catRes.categories || []);
       } catch (err) {
         console.error('Error fetching homepage data:', err);
-      } finally {
-        setLoading(false);
       }
     };
     fetchData();
   }, []);
 
+  const defaultCategories = ['Music', 'Tech', 'Sports', 'Comedy', 'Art', 'Theater'];
+  const featuredEvent = featuredEvents[0];
+
   return (
-    <div className="homepage">
-      {/* Hero Section */}
-      <section className="hero">
-        <div className="hero-bg">
-          <div className="hero-gradient"></div>
-          <div className="hero-particles"></div>
+    <div>
+      <section className="relative flex min-h-[870px] items-center overflow-hidden">
+        <div className="absolute inset-0 z-0 bg-gradient-to-br from-primary/10 via-black to-black">
+          <div className="absolute -right-20 top-1/4 h-96 w-96 rounded-full bg-primary/20 blur-[120px]"></div>
+          <div className="absolute -left-20 bottom-1/4 h-96 w-96 rounded-full bg-primary/10 blur-[100px]"></div>
         </div>
-        <div className="container hero-content">
-          <p className="section-label">THE FUTURE OF EVENTS</p>
-          <h1 className="hero-title">
-            Experience Events<br />
-            <span className="text-accent">Like Never Before</span>
-          </h1>
-          <p className="hero-subtitle">
-            Discover, book, and enjoy the most exciting virtual events from
-            world-class organizers. Your next unforgettable experience is just a
-            click away.
-          </p>
-          <div className="hero-buttons">
-            <Link to="/events" className="btn btn-primary btn-lg">
-              Explore Events
-            </Link>
-            <Link to="/events" className="btn btn-outline btn-lg">
-              Learn More
-            </Link>
-          </div>
-          <div className="hero-stats">
-            <div className="hero-stat">
-              <span className="stat-number">500+</span>
-              <span className="stat-text">Events Hosted</span>
-            </div>
-            <div className="hero-stat">
-              <span className="stat-number">50K+</span>
-              <span className="stat-text">Tickets Sold</span>
-            </div>
-            <div className="hero-stat">
-              <span className="stat-number">100+</span>
-              <span className="stat-text">Organizers</span>
+        <div className="relative z-10 mx-auto w-full max-w-[1200px] px-6">
+          <div className="max-w-3xl">
+            <h1 className="mb-6 text-5xl font-black leading-[1.1] md:text-7xl">
+              Experience Events <span className="italic text-primary">Like Never Before</span>
+            </h1>
+            <p className="mb-10 max-w-2xl text-lg leading-relaxed text-slate-400 md:text-xl">
+              Join the most exclusive virtual gatherings from the comfort of your home.
+              High-definition streaming meets interactive social experiences and global connections.
+            </p>
+            <div className="flex flex-wrap gap-4">
+              <Link
+                to="/events"
+                className="flex items-center gap-2 rounded-full bg-primary px-8 py-4 text-base font-bold text-white transition-all hover:bg-primary/90"
+              >
+                Explore Events <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              </Link>
+              <Link
+                to="/contact"
+                className="rounded-full border border-white/20 px-8 py-4 text-base font-bold text-white transition-all hover:border-white/40 hover:bg-white/5"
+              >
+                Learn More
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Categories Section */}
-      <section className="categories-section">
-        <div className="container">
-          <p className="section-label">BROWSE BY CATEGORY</p>
-          <h2 className="section-title">Find Your Vibe</h2>
-          <div className="categories-grid">
+      <section className="bg-background-dark py-24">
+        <div className="mx-auto max-w-[1200px] px-6">
+          <div className="mb-12">
+            <span className="mb-3 block text-xs font-bold uppercase tracking-[0.2em] text-primary">
+              Browse by Category
+            </span>
+            <h2 className="text-4xl font-bold">Find Your Vibe</h2>
+          </div>
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
             {categories.length > 0
               ? categories.map((cat) => (
-                  <Link to="/events" key={cat} className="category-card">
-                    <span className="category-icon">{CATEGORY_ICONS[cat] || '🎪'}</span>
-                    <span className="category-name">{cat}</span>
+                  <Link
+                    to="/events"
+                    key={cat}
+                    className="group flex flex-col items-center gap-4 rounded-2xl border border-white/5 bg-surface p-8 transition-all hover:-translate-y-1 hover:border-primary/50"
+                  >
+                    <span className="material-symbols-outlined text-3xl text-primary transition-transform group-hover:scale-110">
+                      {CATEGORY_ICONS[cat] || 'celebration'}
+                    </span>
+                    <span className="text-sm font-bold text-slate-300">{cat}</span>
                   </Link>
                 ))
-              : ['Music', 'Technology', 'Sports', 'Comedy', 'Art', 'Theater'].map((cat) => (
-                  <Link to="/events" key={cat} className="category-card">
-                    <span className="category-icon">{CATEGORY_ICONS[cat]}</span>
-                    <span className="category-name">{cat}</span>
+              : defaultCategories.map((cat) => (
+                  <Link
+                    to="/events"
+                    key={cat}
+                    className="group flex flex-col items-center gap-4 rounded-2xl border border-white/5 bg-surface p-8 transition-all hover:-translate-y-1 hover:border-primary/50"
+                  >
+                    <span className="material-symbols-outlined text-3xl text-primary transition-transform group-hover:scale-110">
+                      {CATEGORY_ICONS[cat] || 'celebration'}
+                    </span>
+                    <span className="text-sm font-bold text-slate-300">{cat}</span>
                   </Link>
                 ))}
           </div>
         </div>
       </section>
 
-      {/* Featured Events */}
-      <section className="featured-section">
-        <div className="container">
-          <p className="section-label">DON'T MISS OUT</p>
-          <h2 className="section-title">Featured Events</h2>
-          {loading ? (
-            <div className="loading-container">
-              <div className="spinner"></div>
-              <p>Loading events...</p>
+      <section className="py-24">
+        <div className="mx-auto max-w-[1200px] px-6">
+          <div className="overflow-hidden rounded-2xl border border-white/5 bg-surface">
+            <div className="flex flex-col lg:flex-row">
+              <div className="relative min-h-[400px] lg:w-1/2">
+                <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                <img
+                  src={
+                    featuredEvent?.bannerImage ||
+                    'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800'
+                  }
+                  alt={featuredEvent?.title || 'Featured Event'}
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+              </div>
+
+              <div className="flex flex-col justify-center p-8 md:p-16 lg:w-1/2">
+                <div className="mb-6 inline-block w-fit rounded bg-primary px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white">
+                  Featured Event
+                </div>
+                <h3 className="mb-4 text-4xl font-bold md:text-5xl">
+                  {featuredEvent?.title || 'Neon Nights Live 2024'}
+                </h3>
+                <div className="mb-8 flex flex-wrap gap-6 text-slate-400">
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-lg text-primary">calendar_month</span>
+                    <span className="text-sm">
+                      {featuredEvent?.eventDate
+                        ? new Date(featuredEvent.eventDate).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                          })
+                        : 'Nov 24, 2024'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-lg text-primary">location_on</span>
+                    <span className="text-sm">{featuredEvent?.location || 'Global Streaming'}</span>
+                  </div>
+                </div>
+
+                <p className="mb-10 text-lg leading-relaxed text-slate-400">
+                  {featuredEvent?.description ||
+                    "Join the world's premier electronic music festival from your living room. Experience 4K visuals, spatial audio, and live fan interactions with headliners from across the globe."}
+                </p>
+
+                <div className="mt-auto flex items-center justify-between border-t border-white/10 pt-8">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-widest text-slate-500">
+                      Tickets From
+                    </p>
+                    <p className="text-2xl font-black text-primary">${featuredEvent?.price || '49.00'}</p>
+                  </div>
+
+                  <Link
+                    to={featuredEvent?._id ? `/event/${featuredEvent._id}` : '/events'}
+                    className="rounded-full bg-primary px-10 py-4 font-bold text-white shadow-xl shadow-primary/20 transition-all hover:bg-primary/90"
+                  >
+                    Get Tickets
+                  </Link>
+                </div>
+              </div>
             </div>
-          ) : featuredEvents.length > 0 ? (
-            <div className="featured-grid">
-              {featuredEvents.map((event) => (
-                <EventCard key={event._id} event={event} />
-              ))}
-            </div>
-          ) : (
-            <p className="no-events-text">No events available yet. Check back soon!</p>
-          )}
-          <div className="featured-cta">
-            <Link to="/events" className="btn btn-outline">
-              View All Events →
-            </Link>
           </div>
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="how-it-works" id="how-it-works">
-        <div className="container">
-          <p className="section-label">HOW IT WORKS</p>
-          <h2 className="section-title">Simple Steps to Your Next Event</h2>
-          <div className="steps-grid">
-            <div className="step-card">
-              <div className="step-number">01</div>
-              <div className="step-icon">🔍</div>
-              <h3 className="step-title">Browse Events</h3>
-              <p className="step-desc">
-                Explore our curated selection of virtual events across
-                multiple categories and find what excites you.
+      <section className="bg-black py-24" id="how-it-works">
+        <div className="mx-auto max-w-[1200px] px-6">
+          <div className="mb-16 text-center">
+            <span className="mb-3 block text-xs font-bold uppercase tracking-[0.2em] text-primary">
+              How It Works
+            </span>
+            <h2 className="text-4xl font-bold">Simple Steps to Your Next Event</h2>
+          </div>
+
+          <div className="grid gap-8 md:grid-cols-3">
+            <div className="group relative rounded-2xl border border-white/5 bg-surface p-10 transition-all hover:-translate-y-2 hover:border-primary/20">
+              <div className="mb-6 flex items-center justify-between">
+                <span className="material-symbols-outlined text-5xl text-primary/40">search</span>
+                <span className="text-6xl font-black italic text-white/5">01</span>
+              </div>
+              <h4 className="mb-4 text-xl font-bold text-white">Browse Events</h4>
+              <p className="leading-relaxed text-slate-400">
+                Discover a world of music, tech, and entertainment from our curated global list of premium virtual events.
               </p>
             </div>
-            <div className="step-card">
-              <div className="step-number">02</div>
-              <div className="step-icon">🎟️</div>
-              <h3 className="step-title">Select Tickets</h3>
-              <p className="step-desc">
-                Choose your preferred ticket tier, select the quantity,
-                and add them to your cart with one click.
+
+            <div className="group relative rounded-2xl border border-white/5 bg-surface p-10 transition-all hover:-translate-y-2 hover:border-primary/20">
+              <div className="mb-6 flex items-center justify-between">
+                <span className="material-symbols-outlined text-5xl text-primary/40">shopping_cart</span>
+                <span className="text-6xl font-black italic text-white/5">02</span>
+              </div>
+              <h4 className="mb-4 text-xl font-bold text-white">Select Tickets</h4>
+              <p className="leading-relaxed text-slate-400">
+                Choose your experience tier, from standard view to VIP interactive backstages. Easy, secure checkout.
               </p>
             </div>
-            <div className="step-card">
-              <div className="step-number">03</div>
-              <div className="step-icon">🎉</div>
-              <h3 className="step-title">Enjoy the Show</h3>
-              <p className="step-desc">
-                Get instant access to your tickets, join the event at
-                the scheduled time, and enjoy an unforgettable experience.
+
+            <div className="group relative rounded-2xl border border-white/5 bg-surface p-10 transition-all hover:-translate-y-2 hover:border-primary/20">
+              <div className="mb-6 flex items-center justify-between">
+                <span className="material-symbols-outlined text-5xl text-primary/40">rocket_launch</span>
+                <span className="text-6xl font-black italic text-white/5">03</span>
+              </div>
+              <h4 className="mb-4 text-xl font-bold text-white">Enjoy the Show</h4>
+              <p className="leading-relaxed text-slate-400">
+                Access the stream through any device. Connect with other fans and immerse yourself in the experience.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Banner */}
-      <section className="cta-banner">
-        <div className="container">
-          <div className="cta-content">
-            <h2 className="cta-title">
-              Ready to Experience<br />
-              <span className="text-accent">Something Amazing?</span>
+      <section className="py-20">
+        <div className="mx-auto max-w-[1200px] px-6">
+          <div className="relative overflow-hidden rounded-3xl border border-primary/30 bg-surface p-12 text-center shadow-xl shadow-primary/10 md:p-20">
+            <div className="absolute left-1/2 top-0 h-1 w-full -translate-x-1/2 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50"></div>
+            <h2 className="relative z-10 mb-8 text-4xl font-black text-white md:text-5xl">
+              Ready to Experience Something Amazing?
             </h2>
-            <p className="cta-subtitle">
-              Join thousands of event-goers and discover your next favorite experience.
-            </p>
-            <Link to="/events" className="btn btn-primary btn-lg">
-              Browse All Events
-            </Link>
+            <div className="relative z-10 flex justify-center">
+              <Link
+                to="/events"
+                className="flex items-center gap-3 rounded-full bg-primary px-12 py-5 text-lg font-bold text-white shadow-xl shadow-primary/30 transition-all hover:scale-105 hover:bg-primary/90"
+              >
+                Browse All Events <span className="material-symbols-outlined">explore</span>
+              </Link>
+            </div>
+            <div className="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-primary/5 blur-[80px]"></div>
+            <div className="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-primary/5 blur-[80px]"></div>
           </div>
         </div>
       </section>
