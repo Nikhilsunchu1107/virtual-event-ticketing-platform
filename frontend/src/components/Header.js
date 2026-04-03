@@ -63,6 +63,12 @@ const Header = () => {
               >
                 My Tickets
               </Link>
+              <Link
+                to="/support"
+                className="text-sm font-medium uppercase tracking-wider text-slate-300 transition-colors hover:text-primary"
+              >
+                Support
+              </Link>
             </>
           )}
           {user?.isAdmin && (
@@ -137,6 +143,13 @@ const Header = () => {
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   My Tickets
+                </Link>
+                <Link
+                  to="/support"
+                  className="text-sm font-medium uppercase tracking-wider text-slate-300 transition-colors hover:text-primary"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Support
                 </Link>
               </>
             )}

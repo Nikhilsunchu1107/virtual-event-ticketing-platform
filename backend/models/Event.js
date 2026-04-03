@@ -23,6 +23,10 @@ const eventSchema = new mongoose.Schema(
       enum: ['Technology', 'Business', 'Entertainment', 'Sports', 'Education', 'Other'],
       default: 'Other',
     },
+    tags: {
+      type: [String],
+      default: [],
+    },
     price: {
       type: Number,
       required: [true, 'Please provide ticket price'],
@@ -81,6 +85,6 @@ const eventSchema = new mongoose.Schema(
 );
 
 // Index for search functionality
-eventSchema.index({ title: 'text', description: 'text', category: 1 });
+eventSchema.index({ title: 'text', description: 'text', category: 1, tags: 1 });
 
 module.exports = mongoose.model('Event', eventSchema);

@@ -1,0 +1,232 @@
+/**
+ * Support Controller
+ * Handles support ticket lifecycle and messages
+ */
+
+const Order = require('../models/Order');
+const SupportTicket = require('../models/SupportTicket');
+const TicketMessage = require('../models/TicketMessage');
+
+/**
+ * Create a new support ticket
+ * POST /api/support
+ */
+exports.createTicket = async (req, res, next) => {
+  try {
+    const { subject, description, priority, relatedOrderId } = req.body;
+
+    if (!subject || !description) {
+      return res.status(400).json({
+        success: false,
+        message: 'Subject and description are required',
+      });
+    }
+
+    let relatedOrder = null;
+    if (relatedOrderId) {
+      const order = await Order.findById(relatedOrderId).select('user');
+      if (!order) {
+        return res.status(404).json({
+          success: false,
+          message: 'Related order not found',
+        });
+      }
+
+      if (order.user.toString() !== req.user.id && !req.user.isAdmin) {
+        return res.status(403).json({
+          success: false,
+          message: 'Not authorized to link this order',
+        });
+      }
+
+      relatedOrder = order._id;
+    }
+
+    const ticket = await SupportTicket.create({
+      user: req.user.id,
+      subject,
+      description,
+      priority: priority || 'medium',
+      relatedOrder,
+    });
+
+    await TicketMessage.create({
+      ticket: ticket._id,
+      sender: req.user.id,
+      isAdminReply: !!req.user.isAdmin,
+      message: description,
+    });
+
+    const populatedTicket = await SupportTicket.findById(ticket._id)
+      .populate('user', 'name email')
+      .populate('relatedOrder', 'orderNumber');
+
+    res.status(201).json({
+      success: true,
+      message: 'Support ticket created successfully',
+      ticket: populatedTicket,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Get support tickets
+ * GET /api/support
+ */
+exports.getTickets = async (req, res, next) => {
+  try {
+    const filter = req.user.isAdmin ? {} : { user: req.user.id };
+
+    const tickets = await SupportTicket.find(filter)
+      .populate('user', 'name email')
+      .populate('relatedOrder', 'orderNumber')
+      .sort({ updatedAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      count: tickets.length,
+      tickets,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Get a single support ticket and its messages
+ * GET /api/support/:id
+ */
+exports.getTicketById = async (req, res, next) => {
+  try {
+    const ticket = await SupportTicket.findById(req.params.id)
+      .populate('user', 'name email')
+      .populate('relatedOrder', 'orderNumber');
+
+    if (!ticket) {
+      return res.status(404).json({
+        success: false,
+        message: 'Ticket not found',
+      });
+    }
+
+    if (ticket.user._id.toString() !== req.user.id && !req.user.isAdmin) {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized to view this ticket',
+      });
+    }
+
+    const messages = await TicketMessage.find({ ticket: ticket._id })
+      .populate('sender', 'name email isAdmin')
+      .sort({ createdAt: 1 });
+
+    res.status(200).json({
+      success: true,
+      ticket,
+      messages,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Reply to a support ticket
+ * POST /api/support/:id/reply
+ */
+exports.replyToTicket = async (req, res, next) => {
+  try {
+    const { message } = req.body;
+
+    if (!message) {
+      return res.status(400).json({
+        success: false,
+        message: 'Reply message is required',
+      });
+    }
+
+    const ticket = await SupportTicket.findById(req.params.id);
+    if (!ticket) {
+      return res.status(404).json({
+        success: false,
+        message: 'Ticket not found',
+      });
+    }
+
+    if (ticket.user.toString() !== req.user.id && !req.user.isAdmin) {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized to reply to this ticket',
+      });
+    }
+
+    const ticketMessage = await TicketMessage.create({
+      ticket: ticket._id,
+      sender: req.user.id,
+      isAdminReply: !!req.user.isAdmin,
+      message,
+    });
+
+    if (ticket.status === 'closed') {
+      ticket.status = 'pending';
+    } else if (req.user.isAdmin && ticket.status === 'open') {
+      ticket.status = 'pending';
+    } else if (!req.user.isAdmin && ticket.status === 'pending') {
+      ticket.status = 'open';
+    }
+
+    await ticket.save();
+
+    const populatedMessage = await TicketMessage.findById(ticketMessage._id).populate(
+      'sender',
+      'name email isAdmin'
+    );
+
+    res.status(201).json({
+      success: true,
+      message: 'Reply sent successfully',
+      reply: populatedMessage,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Update support ticket status (Admin only)
+ * PATCH /api/support/:id/status
+ */
+exports.updateTicketStatus = async (req, res, next) => {
+  try {
+    const { status } = req.body;
+    const validStatuses = ['open', 'pending', 'closed'];
+
+    if (!status || !validStatuses.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid status. Must be one of: ${validStatuses.join(', ')}`,
+      });
+    }
+
+    const ticket = await SupportTicket.findById(req.params.id);
+    if (!ticket) {
+      return res.status(404).json({
+        success: false,
+        message: 'Ticket not found',
+      });
+    }
+
+    ticket.status = status;
+    await ticket.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Ticket status updated successfully',
+      ticket,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

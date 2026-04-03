@@ -4,6 +4,8 @@
  */
 
 const Event = require('../models/Event');
+const Order = require('../models/Order');
+const Feedback = require('../models/Feedback');
 
 /**
  * Get all events with filtering and search
@@ -103,6 +105,7 @@ exports.createEvent = async (req, res, next) => {
       bannerImage,
       location,
       speaker,
+      tags,
     } = req.body;
 
     // Validation
@@ -126,6 +129,12 @@ exports.createEvent = async (req, res, next) => {
         bannerImage || 'https://via.placeholder.com/800x400?text=Virtual+Event',
       location: location || 'Online',
       speaker: speaker || '',
+      tags: Array.isArray(tags)
+        ? tags
+            .map((tag) => String(tag).trim())
+            .filter(Boolean)
+            .slice(0, 10)
+        : [],
       createdBy: req.user.id,
     });
 
@@ -176,11 +185,19 @@ exports.updateEvent = async (req, res, next) => {
       'location',
       'speaker',
       'isActive',
+      'tags',
     ];
 
     allowedFields.forEach((field) => {
       if (req.body[field] !== undefined) {
-        event[field] = req.body[field];
+        if (field === 'tags' && Array.isArray(req.body[field])) {
+          event[field] = req.body[field]
+            .map((tag) => String(tag).trim())
+            .filter(Boolean)
+            .slice(0, 10);
+        } else {
+          event[field] = req.body[field];
+        }
       }
     });
 
@@ -248,6 +265,205 @@ exports.getCategories = async (req, res, next) => {
     res.status(200).json({
       success: true,
       categories,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Submit feedback for an attended event
+ * POST /api/events/:id/feedback
+ */
+exports.submitFeedback = async (req, res, next) => {
+  try {
+    const { id: eventId } = req.params;
+    const { rating, comment } = req.body;
+
+    if (!rating) {
+      return res.status(400).json({
+        success: false,
+        message: 'Rating is required',
+      });
+    }
+
+    const event = await Event.findById(eventId);
+    if (!event || !event.isActive) {
+      return res.status(404).json({
+        success: false,
+        message: 'Event not found',
+      });
+    }
+
+    const order = await Order.findOne({
+      user: req.user.id,
+      orderStatus: 'confirmed',
+      'tickets.event': eventId,
+    });
+
+    if (!order) {
+      return res.status(403).json({
+        success: false,
+        message: 'You can only review events you attended',
+      });
+    }
+
+    const feedback = await Feedback.findOneAndUpdate(
+      { user: req.user.id, event: eventId },
+      {
+        rating,
+        comment: comment || '',
+      },
+      {
+        new: true,
+        runValidators: true,
+        upsert: true,
+        setDefaultsOnInsert: true,
+      }
+    ).populate('user', 'name');
+
+    res.status(201).json({
+      success: true,
+      message: 'Feedback submitted successfully',
+      feedback,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Get public feedback for an event
+ * GET /api/events/:id/feedback
+ */
+exports.getEventFeedback = async (req, res, next) => {
+  try {
+    const { id: eventId } = req.params;
+
+    const event = await Event.findById(eventId).select('_id');
+    if (!event) {
+      return res.status(404).json({
+        success: false,
+        message: 'Event not found',
+      });
+    }
+
+    const feedbackItems = await Feedback.find({ event: eventId })
+      .populate('user', 'name')
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const ratingsSummary = {
+      average:
+        feedbackItems.length > 0
+          ? Number(
+              (
+                feedbackItems.reduce((sum, item) => sum + item.rating, 0) /
+                feedbackItems.length
+              ).toFixed(1)
+            )
+          : 0,
+      total: feedbackItems.length,
+    };
+
+    res.status(200).json({
+      success: true,
+      summary: ratingsSummary,
+      feedback: feedbackItems,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Recommend events for current user
+ * GET /api/events/recommendations/me
+ */
+exports.getRecommendations = async (req, res, next) => {
+  try {
+    const userOrders = await Order.find({
+      user: req.user.id,
+      orderStatus: 'confirmed',
+    }).select('tickets.event');
+
+    const attendedEventIds = new Set();
+    userOrders.forEach((order) => {
+      order.tickets.forEach((ticket) => {
+        if (ticket.event) {
+          attendedEventIds.add(ticket.event.toString());
+        }
+      });
+    });
+
+    if (attendedEventIds.size === 0) {
+      const fallbackEvents = await Event.find({ isActive: true })
+        .sort({ eventDate: 1, createdAt: -1 })
+        .limit(6)
+        .lean();
+
+      return res.status(200).json({
+        success: true,
+        recommendations: fallbackEvents,
+      });
+    }
+
+    const attendedEvents = await Event.find({
+      _id: { $in: Array.from(attendedEventIds) },
+    }).select('category tags');
+
+    const categories = new Set();
+    const tags = new Set();
+
+    attendedEvents.forEach((event) => {
+      if (event.category) {
+        categories.add(event.category);
+      }
+
+      (event.tags || []).forEach((tag) => tags.add(tag));
+    });
+
+    const recommendationFilter = {
+      isActive: true,
+      _id: { $nin: Array.from(attendedEventIds) },
+      $or: [],
+    };
+
+    if (categories.size > 0) {
+      recommendationFilter.$or.push({ category: { $in: Array.from(categories) } });
+    }
+
+    if (tags.size > 0) {
+      recommendationFilter.$or.push({ tags: { $in: Array.from(tags) } });
+    }
+
+    let recommendations = [];
+
+    if (recommendationFilter.$or.length > 0) {
+      recommendations = await Event.find(recommendationFilter)
+        .sort({ eventDate: 1, createdAt: -1 })
+        .limit(6)
+        .lean();
+    }
+
+    if (recommendations.length < 6) {
+      const existingIds = new Set(recommendations.map((event) => event._id.toString()));
+      const fillEvents = await Event.find({
+        isActive: true,
+        _id: {
+          $nin: [...Array.from(attendedEventIds), ...Array.from(existingIds)],
+        },
+      })
+        .sort({ eventDate: 1, createdAt: -1 })
+        .limit(6 - recommendations.length)
+        .lean();
+
+      recommendations = [...recommendations, ...fillEvents];
+    }
+
+    res.status(200).json({
+      success: true,
+      recommendations,
     });
   } catch (error) {
     next(error);

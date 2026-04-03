@@ -79,6 +79,40 @@ const eventService = {
       throw error.response?.data || error.message;
     }
   },
+
+  // Submit feedback for an event
+  submitFeedback: async (eventId, payload, token) => {
+    try {
+      const response = await axios.post(`${API_URL}/${eventId}/feedback`, payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
+  // Get event feedback
+  getEventFeedback: async (eventId) => {
+    try {
+      const response = await axios.get(`${API_URL}/${eventId}/feedback`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
+  // Get recommendations for current user
+  getRecommendations: async (token) => {
+    try {
+      const response = await axios.get(`${API_URL}/recommendations/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
 };
 
 export default eventService;

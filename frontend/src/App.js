@@ -19,6 +19,7 @@ import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import OrderConfirmation from './pages/OrderConfirmation';
 import MyTickets from './pages/MyTickets';
+import SupportCenter from './pages/SupportCenter';
 import AdminDashboard from './pages/AdminDashboard';
 import Contact from './pages/Contact';
 
@@ -95,6 +96,14 @@ function AppContent() {
           element={
             <ProtectedRoute>
               <MyTickets />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/support"
+          element={
+            <ProtectedRoute>
+              <SupportCenter />
             </ProtectedRoute>
           }
         />
