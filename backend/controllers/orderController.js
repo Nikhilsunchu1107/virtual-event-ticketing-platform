@@ -3,9 +3,10 @@
  * Handles checkout and order management
  */
 
-const Order = require('../models/Order');
+const crypto = require('crypto');
 const Cart = require('../models/Cart');
 const Event = require('../models/Event');
+const Order = require('../models/Order');
 const { sendTicketConfirmation } = require('../utils/email');
 
 /**
@@ -14,13 +15,29 @@ const { sendTicketConfirmation } = require('../utils/email');
  */
 exports.checkout = async (req, res, next) => {
   try {
-    const { attendeeEmail, attendeeName, attendeePhone, billingAddress, paymentMethod } = req.body;
+    const {
+      attendeeEmail,
+      attendeeName,
+      attendeePhone,
+      billingAddress,
+      paymentMethod,
+      razorpayPaymentId,
+      razorpayOrderId,
+      razorpaySignature,
+    } = req.body;
 
     // Validation
     if (!attendeeEmail || !attendeeName) {
       return res.status(400).json({
         success: false,
         message: 'Please provide attendee details',
+      });
+    }
+
+    if (!razorpayPaymentId || !razorpayOrderId || !razorpaySignature) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide Razorpay payment details',
       });
     }
 
@@ -34,6 +51,32 @@ exports.checkout = async (req, res, next) => {
       });
     }
 
+    const { RAZORPAY_KEY_SECRET } = process.env;
+
+    if (!RAZORPAY_KEY_SECRET) {
+      return res.status(500).json({
+        success: false,
+        message: 'Razorpay key secret is not configured',
+      });
+    }
+
+    const generatedSignature = crypto
+      .createHmac('sha256', RAZORPAY_KEY_SECRET)
+      .update(`${razorpayOrderId}|${razorpayPaymentId}`)
+      .digest('hex');
+
+    const hasSameLength = generatedSignature.length === razorpaySignature.length;
+    const isSignatureValid =
+      hasSameLength &&
+      crypto.timingSafeEqual(Buffer.from(generatedSignature), Buffer.from(razorpaySignature));
+
+    if (!isSignatureValid) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid Razorpay payment signature',
+      });
+    }
+
     // Check ticket availability and prepare tickets
     const tickets = [];
     const orderData = {
@@ -42,7 +85,9 @@ exports.checkout = async (req, res, next) => {
       attendeeName,
       attendeePhone: attendeePhone || '',
       billingAddress: billingAddress || {},
-      paymentMethod: paymentMethod || 'credit_card',
+      paymentMethod: paymentMethod || 'razorpay',
+      razorpayOrderId,
+      razorpayPaymentId,
       totalAmount: 0,
       paymentStatus: 'completed',
       orderStatus: 'confirmed',

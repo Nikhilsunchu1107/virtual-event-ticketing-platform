@@ -18,7 +18,7 @@ const sendTicketConfirmation = async (email, orderData) => {
       Thank you for your purchase! Here are your event tickets:
 
       Order Number: ${orderData.orderNumber}
-      Total Amount: $${orderData.totalAmount}
+      Total Amount: ₹${orderData.totalAmount}
       Date: ${new Date().toLocaleDateString()}
 
       Tickets:

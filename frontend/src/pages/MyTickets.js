@@ -111,7 +111,7 @@ const MyTickets = () => {
                 <div className="order-summary">
                   <div className="summary-item">
                     <span>Total Amount</span>
-                    <span className="amount">${order.totalAmount}</span>
+                    <span className="amount">₹{order.totalAmount}</span>
                   </div>
                   <div className="summary-item">
                     <span>Payment Status</span>

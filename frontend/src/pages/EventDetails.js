@@ -148,7 +148,7 @@ const EventDetails = () => {
             <div className="pricing-card">
               <div className="price-section">
                 <span className="price-label">Price per Ticket</span>
-                <span className="price-value">${event.price}</span>
+                <span className="price-value">₹{event.price}</span>
               </div>
 
               <div className="availability-section">
@@ -203,7 +203,7 @@ const EventDetails = () => {
 
                   <div className="total-section">
                     <span>Total Price:</span>
-                    <span className="total-price">${event.price * quantity}</span>
+                    <span className="total-price">₹{event.price * quantity}</span>
                   </div>
 
                   <button

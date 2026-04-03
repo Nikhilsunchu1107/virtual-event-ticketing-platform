@@ -81,7 +81,7 @@ const OrderConfirmation = () => {
               </div>
               <div className="detail-item">
                 <span className="label">Total Amount</span>
-                <span className="value price">${order.totalAmount.toFixed(2)}</span>
+                <span className="value price">₹{order.totalAmount.toFixed(2)}</span>
               </div>
               <div className="detail-item">
                 <span className="label">Payment Status</span>

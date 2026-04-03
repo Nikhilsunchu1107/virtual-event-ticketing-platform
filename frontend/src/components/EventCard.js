@@ -43,7 +43,7 @@ const EventCard = ({ event }) => {
         )}
 
         <div className="event-footer">
-          <span className="event-price">${event.price}</span>
+          <span className="event-price">₹{event.price}</span>
           <Link to={`/event/${event._id}`} className="btn btn-primary">
             View Details
           </Link>

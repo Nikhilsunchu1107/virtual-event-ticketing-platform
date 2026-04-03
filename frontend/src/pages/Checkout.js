@@ -2,18 +2,51 @@
  * Checkout Page
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import cartService from '../services/cartService';
 import orderService from '../services/orderService';
+import paymentService from '../services/paymentService';
 import './Checkout.css';
+
+const loadRazorpayScript = () => {
+  return new Promise((resolve) => {
+    if (window.Razorpay) {
+      resolve(true);
+      return;
+    }
+
+    const existingScript = document.querySelector(
+      'script[src="https://checkout.razorpay.com/v1/checkout.js"]'
+    );
+
+    if (existingScript) {
+      existingScript.addEventListener('load', () => resolve(true));
+      existingScript.addEventListener('error', () => resolve(false));
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
 
 const Checkout = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [paymentStatus, setPaymentStatus] = useState('');
+
+  useEffect(() => {
+    loadRazorpayScript();
+  }, []);
+
   const [formData, setFormData] = useState({
     attendeeName: user?.name || '',
     attendeeEmail: user?.email || '',
@@ -25,7 +58,7 @@ const Checkout = () => {
       postalCode: '',
       country: '',
     },
-    paymentMethod: 'credit_card',
+    paymentMethod: 'razorpay',
   });
 
   const handleInputChange = (e) => {
@@ -46,15 +79,84 @@ const Checkout = () => {
     try {
       setLoading(true);
       setError('');
+      setPaymentStatus('Initializing secure checkout...');
       const token = localStorage.getItem('token');
-      const response = await orderService.checkout(formData, token);
-      // Clear cart
-      await cartService.clearCart(token);
-      navigate(`/order-confirmation/${response.order._id}`);
+
+      const isLoaded = await loadRazorpayScript();
+      if (!isLoaded) {
+        throw new Error('Razorpay SDK failed to load. Are you online?');
+      }
+
+      const orderData = await paymentService.createOrder(token);
+      setPaymentStatus('Awaiting payment completion...');
+
+      const options = {
+        key: process.env.REACT_APP_RAZORPAY_KEY_ID || orderData.keyId,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: 'Virtual Event Ticketing',
+        description: 'Ticket Purchase',
+        order_id: orderData.order.id,
+        handler: async function (response) {
+          try {
+            setLoading(true);
+            setPaymentStatus('Payment successful! Verifying payment...');
+
+            await paymentService.verifyPayment(
+              {
+                razorpayPaymentId: response.razorpay_payment_id,
+                razorpayOrderId: response.razorpay_order_id,
+                razorpaySignature: response.razorpay_signature,
+              },
+              token
+            );
+
+            setPaymentStatus('Payment verified! Creating order...');
+
+            const checkoutPayload = {
+              ...formData,
+              paymentMethod: 'razorpay',
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpayOrderId: response.razorpay_order_id,
+              razorpaySignature: response.razorpay_signature,
+            };
+            const checkoutRes = await orderService.checkout(checkoutPayload, token);
+            await cartService.clearCart(token);
+            navigate(`/order-confirmation/${checkoutRes.order._id}`);
+          } catch (err) {
+            setError(err.message || 'Order completion failed after payment.');
+            setLoading(false);
+            setPaymentStatus('');
+          }
+        },
+        prefill: {
+          name: formData.attendeeName,
+          email: formData.attendeeEmail,
+          contact: formData.attendeePhone,
+        },
+        theme: {
+          color: '#2b5eb7',
+        },
+        modal: {
+          ondismiss: function () {
+            setLoading(false);
+            setPaymentStatus('');
+            setError('Payment cancelled by user.');
+          },
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.on('payment.failed', function (response) {
+        setError(response.error.description || 'Payment failed.');
+        setLoading(false);
+        setPaymentStatus('');
+      });
+      rzp.open();
     } catch (err) {
-      setError(err.message || 'Checkout failed');
-    } finally {
+      setError(err.message || err?.message || 'Checkout failed');
       setLoading(false);
+      setPaymentStatus('');
     }
   };
 
@@ -164,20 +266,7 @@ const Checkout = () => {
             {/* Payment Method */}
             <section className="form-section">
               <h2>Payment Method</h2>
-              <div className="payment-methods">
-                {['credit_card', 'debit_card', 'paypal'].map((method) => (
-                  <label key={method} className="payment-option">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value={method}
-                      checked={formData.paymentMethod === method}
-                      onChange={handleInputChange}
-                    />
-                    <span>{method.replace('_', ' ').toUpperCase()}</span>
-                  </label>
-                ))}
-              </div>
+              <p>Razorpay (UPI, Cards, Netbanking, Wallets)</p>
             </section>
           </div>
 
@@ -192,6 +281,11 @@ const Checkout = () => {
               >
                 {loading ? 'Processing...' : '✓ Complete Purchase'}
               </button>
+              {loading && paymentStatus && (
+                <p className="payment-status-message" style={{ marginTop: '15px', fontSize: '14px', color: 'var(--primary-color)', textAlign: 'center', fontWeight: '500' }}>
+                  {paymentStatus}
+                </p>
+              )}
             </div>
           </div>
         </form>

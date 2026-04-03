@@ -220,7 +220,7 @@ async function seedDatabase() {
     // Display created events
     console.log('\n📋 Demo Events Created:');
     createdEvents.forEach((event, index) => {
-      console.log(`${index + 1}. ${event.title} (${event.category}) - $${event.price}`);
+      console.log(`${index + 1}. ${event.title} (${event.category}) - ₹${event.price}`);
     });
 
     console.log('\n✨ Database seeding completed successfully!');

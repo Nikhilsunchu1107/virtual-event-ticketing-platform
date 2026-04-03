@@ -31,3 +31,6 @@ Thumbs.db
 # Misc
 .cache/
 .DS_Store
+
+# UI mockups
+stitch_screens/

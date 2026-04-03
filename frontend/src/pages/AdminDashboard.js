@@ -218,7 +218,7 @@ const AdminDashboard = () => {
                     <div className="stat-icon">💰</div>
                     <div className="stat-info">
                       <p className="stat-label">Total Revenue</p>
-                      <p className="stat-value">${stats.totalRevenue?.toFixed(2)}</p>
+                      <p className="stat-value">₹{stats.totalRevenue?.toFixed(2)}</p>
                     </div>
                   </div>
 
@@ -249,7 +249,7 @@ const AdminDashboard = () => {
                           <tr key={order._id}>
                             <td>{order.orderNumber}</td>
                             <td>{order.user?.name}</td>
-                            <td>${order.totalAmount.toFixed(2)}</td>
+                            <td>₹{order.totalAmount.toFixed(2)}</td>
                             <td>
                               <span className={`status-badge status-${order.orderStatus}`}>
                                 {order.orderStatus}
@@ -275,7 +275,7 @@ const AdminDashboard = () => {
                           </p>
                         </div>
                         <p className="event-revenue">
-                          ${(event.price * event.ticketsSold).toFixed(2)}
+                          ₹{(event.price * event.ticketsSold).toFixed(2)}
                         </p>
                       </div>
                     ))}
@@ -350,7 +350,7 @@ const AdminDashboard = () => {
                               <small style={{ color: '#888' }}>{order.user?.email}</small>
                             </td>
                             <td>{order.tickets?.length || 0}</td>
-                            <td><strong>${order.totalAmount.toFixed(2)}</strong></td>
+                            <td><strong>₹{order.totalAmount.toFixed(2)}</strong></td>
                             <td>
                               <span className={`status-badge status-${order.paymentStatus}`}>
                                 {order.paymentStatus}
@@ -464,7 +464,7 @@ const AdminDashboard = () => {
                               </small>
                             </td>
                             <td>{event.category}</td>
-                            <td>${event.price}</td>
+                            <td>₹{event.price}</td>
                             <td>{event.ticketsAvailable}</td>
                             <td>{event.ticketsSold}</td>
                             <td>
@@ -586,7 +586,7 @@ const AdminDashboard = () => {
                       {analytics.map((event) => (
                         <tr key={event.id}>
                           <td>{event.title}</td>
-                          <td>${event.price}</td>
+                          <td>₹{event.price}</td>
                           <td>
                             {event.ticketsSold} / {event.ticketsAvailable}
                           </td>
@@ -599,7 +599,7 @@ const AdminDashboard = () => {
                             </div>
                             {event.occupancy}%
                           </td>
-                          <td className="revenue">${event.revenue.toFixed(2)}</td>
+                          <td className="revenue">₹{event.revenue.toFixed(2)}</td>
                         </tr>
                       ))}
                     </tbody>

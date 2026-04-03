@@ -70,11 +70,19 @@ const orderSchema = new mongoose.Schema(
       postalCode: String,
       country: String,
     },
-    // Payment info (mock)
+    // Payment info
     paymentMethod: {
       type: String,
-      enum: ['credit_card', 'debit_card', 'paypal'],
-      default: 'credit_card',
+      enum: ['credit_card', 'debit_card', 'paypal', 'razorpay'],
+      default: 'razorpay',
+    },
+    razorpayOrderId: {
+      type: String,
+      default: '',
+    },
+    razorpayPaymentId: {
+      type: String,
+      default: '',
     },
     notes: String,
     createdAt: {

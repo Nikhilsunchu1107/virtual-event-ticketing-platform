@@ -99,7 +99,7 @@ const Cart = () => {
                     <p className="item-date">
                       📅 {new Date(item.event.eventDate).toLocaleDateString()}
                     </p>
-                    <p className="item-price">${item.price} per ticket</p>
+                    <p className="item-price">₹{item.price} per ticket</p>
                   </div>
                   <div className="item-quantity">
                     <button
@@ -117,7 +117,7 @@ const Cart = () => {
                     </button>
                   </div>
                   <div className="item-total">
-                    <p className="total-price">${item.price * item.quantity}</p>
+                    <p className="total-price">₹{item.price * item.quantity}</p>
                   </div>
                   <button
                     onClick={() => handleRemoveItem(item.event._id)}
@@ -133,7 +133,7 @@ const Cart = () => {
               <h2>Order Summary</h2>
               <div className="summary-item">
                 <span>Subtotal ({cart.items.reduce((sum, item) => sum + item.quantity, 0)} tickets)</span>
-                <span>${cart.totalPrice.toFixed(2)}</span>
+                <span>₹{cart.totalPrice.toFixed(2)}</span>
               </div>
               <div className="summary-item">
                 <span>Taxes</span>
@@ -141,7 +141,7 @@ const Cart = () => {
               </div>
               <div className="summary-total">
                 <span>Total</span>
-                <span>${cart.totalPrice.toFixed(2)}</span>
+                <span>₹{cart.totalPrice.toFixed(2)}</span>
               </div>
               <button onClick={handleCheckout} className="btn btn-primary btn-full">
                 Proceed to Checkout
