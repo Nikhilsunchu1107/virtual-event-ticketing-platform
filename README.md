@@ -2,127 +2,166 @@
 
 A full-stack e-commerce platform for booking virtual event tickets. Built with **React.js** (frontend), **Node.js + Express** (backend), and **MongoDB** (database).
 
-## 🎯 Features
+## Features
 
 ### 1. User Authentication
-- ✅ User registration with email validation
-- ✅ Login with JWT authentication
-- ✅ Password hashing using bcrypt
-- ✅ User profile management
-- ✅ Password change functionality
+- User registration with email validation
+- Login with JWT authentication
+- Password hashing using bcrypt
+- User profile management
+- Password change functionality
+- Referral source tracking
 
 ### 2. Event Management
-- ✅ Browse all virtual events
-- ✅ Advanced search and filtering (price, category, date)
-- ✅ Event details page with full information
-- ✅ Event categories (Technology, Business, Entertainment, Sports, Education)
-- ✅ Real-time ticket availability tracking
-- ✅ Event organizer information
+- Browse all virtual events
+- Advanced search and filtering (price, category, date)
+- Event details page with full information
+- Event categories (Technology, Business, Entertainment, Sports, Education)
+- Real-time ticket availability tracking
+- Event organizer information
+- Event feedback and ratings
 
 ### 3. Shopping Cart
-- ✅ Add/remove tickets from cart
-- ✅ Update ticket quantities
-- ✅ Real-time price calculation
-- ✅ Cart persistence in database (linked to user)
-- ✅ Clear cart functionality
+- Add/remove tickets from cart
+- Update ticket quantities
+- Real-time price calculation
+- Cart persistence in database (linked to user)
+- Clear cart functionality
 
 ### 4. Checkout System
-- ✅ Attendee information collection
-- ✅ Billing address management
-- ✅ Multiple payment method options
-- ✅ Order confirmation with ticket generation
-- ✅ Automatic ticket number generation
+- Attendee information collection
+- Billing address management
+- Razorpay payment integration
+- Order confirmation with ticket generation
+- Automatic ticket number generation
 
 ### 5. Order Management
-- ✅ View all user orders/tickets
-- ✅ Order tracking and status
-- ✅ Ticket download (mock PDF)
-- ✅ Cancel orders
-- ✅ Order confirmation emails (mock)
+- View all user orders/tickets
+- Order tracking and status
+- Ticket download (PDF)
+- Cancel orders
+- Order confirmation emails
 
 ### 6. Admin Panel
-- ✅ Dashboard with key metrics
-- ✅ User management
-- ✅ Events analytics and reporting
-- ✅ Sales reports
-- ✅ Recent orders monitoring
+- Dashboard with key metrics
+- User management
+- Events analytics and reporting
+- Sales reports
+- Recent orders monitoring
+- Inventory management
+- CRM module (VIP users, segmentation)
+- ERP module (finances, expenses, resources)
+- Marketing analytics (mock)
 
-## 📁 Project Structure
+### 7. Digital Marketing
+- SEO optimization (meta tags, Open Graph, Twitter Cards)
+- Promotional landing pages (Summer, Black Friday)
+- Newsletter subscription
+- Referral tracking (`?ref=`, `utm_` parameters)
+- Mock analytics dashboard
+
+### 8. Security
+- Helmet for secure HTTP headers
+- Rate limiting (generic + auth-specific)
+- NoSQL injection protection (express-mongo-sanitize)
+- XSS protection (xss-clean)
+- HTTP parameter pollution protection (hpp)
+- Razorpay webhook signature verification
+
+## Project Structure
 
 ```
-virtual-event-ticketing/
+virtual-event-ticketing-platform/
 ├── backend/
-│   ├── config/
-│   │   └── database.js          # MongoDB connection
+│   ├── config/database.js
 │   ├── controllers/
-│   │   ├── authController.js    # Auth logic
-│   │   ├── eventController.js   # Event management
-│   │   ├── cartController.js    # Cart operations
-│   │   ├── orderController.js   # Order processing
-│   │   └── adminController.js   # Admin operations
+│   │   ├── authController.js
+│   │   ├── eventController.js
+│   │   ├── cartController.js
+│   │   ├── orderController.js
+│   │   ├── paymentController.js
+│   │   ├── adminController.js
+│   │   ├── supportController.js
+│   │   ├── inventoryController.js
+│   │   ├── crmController.js
+│   │   └── erpController.js
 │   ├── middleware/
-│   │   ├── auth.js              # JWT verification
-│   │   └── errorHandler.js      # Error handling
+│   │   ├── auth.js
+│   │   ├── errorHandler.js
+│   │   └── rateLimiter.js
 │   ├── models/
-│   │   ├── User.js              # User schema
-│   │   ├── Event.js             # Event schema
-│   │   ├── Cart.js              # Cart schema
-│   │   └── Order.js             # Order schema
+│   │   ├── User.js
+│   │   ├── Event.js
+│   │   ├── Cart.js
+│   │   ├── Order.js
+│   │   ├── Subscriber.js
+│   │   ├── SupportTicket.js
+│   │   ├── Feedback.js
+│   │   ├── MarketingCampaign.js
+│   │   ├── Expense.js
+│   │   └── Resource.js
 │   ├── routes/
-│   │   ├── auth.js              # Auth endpoints
-│   │   ├── events.js            # Event endpoints
-│   │   ├── cart.js              # Cart endpoints
-│   │   ├── orders.js            # Order endpoints
-│   │   └── admin.js             # Admin endpoints
+│   │   ├── auth.js
+│   │   ├── events.js
+│   │   ├── cart.js
+│   │   ├── orders.js
+│   │   ├── paymentRoutes.js
+│   │   ├── admin.js
+│   │   ├── inventory.js
+│   │   ├── support.js
+│   │   ├── crm.js
+│   │   ├── erp.js
+│   │   └── marketing.js
 │   ├── utils/
-│   │   ├── jwt.js               # JWT utilities
-│   │   ├── email.js             # Email service (mock)
-│   │   └── pdf.js               # PDF generation (mock)
+│   │   ├── jwt.js
+│   │   ├── email.js
+│   │   └── pdf.js
 │   ├── package.json
-│   ├── server.js                # Main server file
+│   ├── server.js
 │   └── .env.example
 │
 ├── frontend/
 │   ├── public/
-│   │   └── index.html
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── Header.js        # Navigation header
-│   │   │   ├── Header.css
-│   │   │   ├── EventCard.js     # Event card component
-│   │   │   └── EventCard.css
-│   │   ├── context/
-│   │   │   └── AuthContext.js   # Auth state management
+│   │   │   ├── Header.js
+│   │   │   ├── Footer.js
+│   │   │   ├── EventCard.js
+│   │   │   ├── SEO.js
+│   │   │   └── NewsletterSignup.js
+│   │   ├── context/AuthContext.js
 │   │   ├── pages/
-│   │   │   ├── EventList.js     # Home/event listing
-│   │   │   ├── EventDetails.js  # Event details
-│   │   │   ├── Login.js         # Login page
-│   │   │   ├── Register.js      # Registration page
-│   │   │   ├── Cart.js          # Shopping cart
-│   │   │   ├── Checkout.js      # Checkout form
+│   │   │   ├── Homepage.js
+│   │   │   ├── EventList.js
+│   │   │   ├── EventDetails.js
+│   │   │   ├── Login.js
+│   │   │   ├── Register.js
+│   │   │   ├── Cart.js
+│   │   │   ├── Checkout.js
 │   │   │   ├── OrderConfirmation.js
-│   │   │   ├── MyTickets.js     # View purchased tickets
+│   │   │   ├── MyTickets.js
+│   │   │   ├── SupportCenter.js
 │   │   │   ├── AdminDashboard.js
-│   │   │   └── [CSS files]
+│   │   │   ├── Contact.js
+│   │   │   ├── SummerPromo.js
+│   │   │   └── BlackFridayPromo.js
 │   │   ├── services/
-│   │   │   ├── authService.js
-│   │   │   ├── eventService.js
-│   │   │   ├── cartService.js
-│   │   │   ├── orderService.js
-│   │   │   └── adminService.js
-│   │   ├── styles/
-│   │   │   └── global.css
-│   │   ├── App.js               # Main app with routes
-│   │   └── index.js             # Entry point
-│   └── package.json
+│   │   ├── utils/tracking.js
+│   │   ├── styles/global.css
+│   │   ├── App.js
+│   │   └── index.js
+│   ├── package.json
+│   └── vercel.json
 │
+├── plans/
+├── render.yaml
 └── README.md
 ```
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
-- Node.js (v14+)
+- Node.js (v16+)
 - MongoDB (local or Atlas)
 - Git
 
@@ -150,21 +189,13 @@ virtual-event-ticketing/
    JWT_EXPIRE=7d
    PORT=5000
    NODE_ENV=development
+   RAZORPAY_KEY_ID=your_razorpay_key_id
+   RAZORPAY_KEY_SECRET=your_razorpay_key_secret
    ```
 
-5. **Ensure MongoDB is running:**
-   ```bash
-   # On Windows (if using local MongoDB)
-   mongod
-   
-   # Or use MongoDB Atlas connection string
-   ```
-
-6. **Start backend server:**
+5. **Start backend server:**
    ```bash
    npm run dev
-   # or
-   npm start
    ```
 
    Server runs on `http://localhost:5000`
@@ -188,91 +219,14 @@ virtual-event-ticketing/
 
    App runs on `http://localhost:3000`
 
-## 📚 MongoDB Schemas
+### Seed Database (Optional)
 
-### User Schema
-```javascript
-{
-  name: String (required),
-  email: String (required, unique),
-  password: String (hashed, required),
-  phone: String,
-  isAdmin: Boolean (default: false),
-  createdAt: Date
-}
+```bash
+cd backend
+npm run seed
 ```
 
-### Event Schema
-```javascript
-{
-  title: String (required),
-  description: String (required),
-  category: String (enum),
-  price: Number (required),
-  ticketsAvailable: Number (required),
-  ticketsSold: Number (default: 0),
-  eventDate: Date (required),
-  eventTime: String (HH:MM format),
-  duration: String,
-  bannerImage: String,
-  location: String,
-  speaker: String,
-  isActive: Boolean,
-  createdBy: ObjectId (ref: User),
-  createdAt: Date
-}
-```
-
-### Cart Schema
-```javascript
-{
-  user: ObjectId (ref: User, unique),
-  items: [
-    {
-      event: ObjectId (ref: Event),
-      quantity: Number,
-      price: Number
-    }
-  ],
-  totalPrice: Number,
-  updatedAt: Date
-}
-```
-
-### Order Schema
-```javascript
-{
-  user: ObjectId (ref: User),
-  tickets: [
-    {
-      ticketNumber: String (unique),
-      event: ObjectId (ref: Event),
-      eventTitle: String,
-      eventDate: Date,
-      eventTime: String,
-      quantity: Number
-    }
-  ],
-  totalAmount: Number,
-  paymentStatus: String (pending/completed/failed),
-  orderStatus: String (confirmed/cancelled),
-  orderNumber: String (unique),
-  attendeeEmail: String,
-  attendeeName: String,
-  attendeePhone: String,
-  billingAddress: {
-    street: String,
-    city: String,
-    state: String,
-    postalCode: String,
-    country: String
-  },
-  paymentMethod: String,
-  createdAt: Date
-}
-```
-
-## 🔌 API Endpoints
+## API Endpoints
 
 ### Authentication
 - `POST /api/auth/register` - Register new user
@@ -288,6 +242,7 @@ virtual-event-ticketing/
 - `PUT /api/events/:id` - Update event (admin)
 - `DELETE /api/events/:id` - Delete event (admin)
 - `GET /api/events/categories` - Get categories
+- `GET /api/events/recommendations/me` - Get personalized recommendations
 
 ### Cart
 - `GET /api/cart` - Get user's cart
@@ -301,158 +256,95 @@ virtual-event-ticketing/
 - `GET /api/orders/my-orders` - Get user's orders
 - `GET /api/orders/:id` - Get order details
 - `PUT /api/orders/:id/cancel` - Cancel order
-- `GET /api/orders/:orderId/tickets/:ticketId/download` - Download ticket
-- `GET /api/orders` - Get all orders (admin)
+
+### Payments
+- `POST /api/payments/create-order` - Create Razorpay order
+- `POST /api/payments/verify` - Verify payment signature
 
 ### Admin
-- `GET /api/admin/users` - Get all users
-- `GET /api/admin/users/:id` - Get user details
-- `PUT /api/admin/users/:id/role` - Update user role
-- `DELETE /api/admin/users/:id` - Delete user
 - `GET /api/admin/dashboard/stats` - Dashboard statistics
 - `GET /api/admin/events/analytics` - Events analytics
-- `GET /api/admin/reports/sales` - Sales reports
+- `GET /api/admin/users` - Get all users
+- `GET /api/admin/orders` - Get all orders
 
-## 🧪 Testing the Application
+### Marketing
+- `POST /api/marketing/subscribe` - Newsletter subscription
 
-### Create Test Events
-1. Login as admin
-2. Navigate to `/admin` (auto-redirected if not admin)
-3. Create sample events with details
+### Inventory
+- `GET /api/inventory/overview` - Inventory overview
+- `POST /api/inventory/adjust` - Adjust inventory
 
-### Test User Flow
-1. Register new account
-2. Browse events with filters
-3. View event details
-4. Add tickets to cart
-5. Go to checkout
-6. Complete purchase
-7. View tickets in "My Tickets"
+### Support
+- `GET /api/support/tickets` - Get support tickets
+- `POST /api/support/tickets` - Create support ticket
 
-### Test Admin Features
-1. Login with admin account
-2. View dashboard statistics
-3. Check user management
-4. View event analytics
-5. Review sales reports
+### CRM
+- `GET /api/crm/users` - Get users with filters (vip, new_users, inactive)
 
-## 🎨 UI/UX Features
+### ERP
+- `GET /api/erp/finances` - Get financial summary
+- `GET /api/erp/expenses` - Get expenses
+- `GET /api/erp/resources` - Get resources
 
-- **Responsive Design** - Works on desktop, tablet, and mobile
-- **Modern Gradient Headers** - Purple to pink gradients
-- **Smooth Animations** - Hover effects and transitions
-- **Loading States** - Spinners and loading indicators
-- **Error Handling** - User-friendly error messages
-- **Alert Messages** - Success, error, and warning alerts
-- **Form Validation** - Client-side validation with feedback
+## Deployment
 
-## 🔐 Security Features
+### Backend (Render)
+1. Push code to GitHub
+2. Create new Web Service on Render
+3. Connect to your GitHub repository
+4. Set root directory to `backend`
+5. Configure environment variables:
+   - `NODE_ENV=production`
+   - `MONGO_URI=your-mongodb-atlas-uri`
+   - `JWT_SECRET=your-64-char-random-string`
+   - `RAZORPAY_KEY_ID`
+   - `RAZORPAY_KEY_SECRET`
 
-- **JWT Authentication** - Secure token-based auth
-- **Password Hashing** - bcrypt with salt rounds
-- **Protected Routes** - Server-side route protection
-- **Admin Verification** - Role-based access control
-- **Input Validation** - Server-side data validation
-- **Error Handling** - Centralized error management
+### Frontend (Vercel)
+1. Push code to GitHub
+2. Import project on Vercel
+3. Update `frontend/vercel.json` with your Render backend URL
+4. Deploy
 
-## 📝 Environment Variables
-
-### Backend (.env)
-```env
-MONGO_URI=mongodb://localhost:27017/virtual-event-ticketing
-JWT_SECRET=your_secret_key
-JWT_EXPIRE=7d
-PORT=5000
-NODE_ENV=development
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_USER=your_email@gmail.com
-EMAIL_PASSWORD=your_app_password
-```
-
-### Frontend (.env - if needed)
-```env
-REACT_APP_API_URL=http://localhost:5000
-```
-
-## 🛠️ Tech Stack
+## Tech Stack
 
 **Frontend:**
 - React.js 18
 - React Router v6
-- Axios (API calls)
-- CSS3 (Flexbox, Grid)
+- React Helmet Async (SEO)
+- Axios
 
 **Backend:**
 - Node.js
 - Express.js
 - MongoDB & Mongoose
 - JWT (jsonwebtoken)
-- Bcrypt (password hashing)
-- PDFKit (mock)
+- Bcrypt
+- Helmet, express-rate-limit, express-mongo-sanitize, xss-clean, hpp
+- Razorpay SDK
 
-## 📦 Key Dependencies
+## Security Features
 
-**Backend:**
-- mongoose: ^7.0.3
-- express: ^4.18.2
-- jsonwebtoken: ^9.0.0
-- bcryptjs: ^2.4.3
-- cors: ^2.8.5
-- dotenv: ^16.0.3
+- JWT authentication with secure tokens
+- Password hashing with bcrypt
+- Protected routes with middleware
+- Rate limiting (100 req/10min generic, 5 req/15min auth)
+- NoSQL injection prevention
+- XSS protection
+- HTTP parameter pollution protection
+- Secure HTTP headers (Helmet)
+- Payment signature verification
 
-**Frontend:**
-- react: ^18.2.0
-- react-router-dom: ^6.9.0
-- axios: ^1.3.4
-
-## 🚀 Deployment
-
-### Backend (Heroku/Railway)
-1. Create Git repository
-2. Push code to GitHub
-3. Connect to Heroku/Railway
-4. Set environment variables
-5. Deploy
-
-### Frontend (Vercel/Netlify)
-1. Build React app: `npm run build`
-2. Connect GitHub repo to Vercel/Netlify
-3. Deploy automatically on push
-
-## 🐛 Known Limitations
+## Known Limitations
 
 - Email sending is mocked (logs to console)
 - PDF generation is mocked
-- Payment integration is dummy
-- Single admin role (no role hierarchy)
-- No image upload (using placeholder URLs)
+- Analytics are mock data (not real GA4/Facebook Pixel)
 
-## 🚀 Future Enhancements
+## License
 
-1. Real payment gateway integration (Stripe/PayPal)
-2. Email notifications with nodemailer
-3. Actual PDF ticket generation
-4. Image upload for event banners
-5. User reviews and ratings
-6. Wishlist functionality
-7. Email verification
-8. Two-factor authentication
-9. Refund management
-10. Event categorization improvements
-
-## 📄 License
-
-MIT License - feel free to use for learning and commercial projects
-
-## 👨‍💻 Author
-
-Created as a full-stack e-commerce project demonstration
-
-## 💬 Support
-
-For issues or questions, please check the code comments or contact support.
+MIT License
 
 ---
 
-**Happy Ticketing! 🎫**
+**Happy Ticketing!**
