@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import adminService from '../services/adminService';
 import inventoryService from '../services/inventoryService';
+import crmService from '../services/crmService';
+import erpService from '../services/erpService';
 
 const AdminDashboard = () => {
   const { user } = useAuth();
@@ -20,6 +22,13 @@ const AdminDashboard = () => {
 
   const [adjustingEventId, setAdjustingEventId] = useState(null);
   const [adjustmentValue, setAdjustmentValue] = useState(0);
+
+  const [crmUsers, setCrmUsers] = useState([]);
+  const [crmSegment, setCrmSegment] = useState('');
+  
+  const [erpFinances, setErpFinances] = useState(null);
+  const [erpExpenses, setErpExpenses] = useState([]);
+  const [erpResources, setErpResources] = useState([]);
 
   useEffect(() => {
     fetchDashboardData();
@@ -46,6 +55,18 @@ const AdminDashboard = () => {
       } else if (activeTab === 'inventory') {
         const response = await inventoryService.getInventoryOverview(token);
         setInventory(response.inventory);
+      } else if (activeTab === 'crm') {
+        const response = await crmService.getUsers({ segment: crmSegment });
+        setCrmUsers(response.data);
+      } else if (activeTab === 'erp') {
+        const [financesRes, expensesRes, resourcesRes] = await Promise.all([
+          erpService.getFinancesSummary(),
+          erpService.getExpenses(),
+          erpService.getResources(),
+        ]);
+        setErpFinances(financesRes.data);
+        setErpExpenses(expensesRes.data);
+        setErpResources(resourcesRes.data);
       }
     } catch (err) {
       setError(err.message || 'Failed to fetch data');
@@ -124,6 +145,8 @@ const AdminDashboard = () => {
     ['inventory', 'Inventory'],
     ['users', 'Users'],
     ['analytics', 'Analytics'],
+    ['crm', 'CRM'],
+    ['erp', 'ERP'],
   ];
 
   return (
@@ -504,6 +527,151 @@ const AdminDashboard = () => {
                     ))}
                   </tbody>
                 </table>
+              </div>
+            )}
+
+            {activeTab === 'crm' && (
+              <div className="space-y-4">
+                <div className="flex flex-wrap gap-3 rounded-2xl border border-white/10 bg-surface p-4">
+                  <select
+                    value={crmSegment}
+                    onChange={(e) => setCrmSegment(e.target.value)}
+                    className="rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white"
+                  >
+                    <option value="">All Users</option>
+                    <option value="vip">VIP (>$500 spent)</option>
+                    <option value="new_users">New Users (30 days)</option>
+                    <option value="inactive">Inactive (90 days)</option>
+                  </select>
+                  <button
+                    className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white"
+                    onClick={async () => {
+                      const token = localStorage.getItem('token');
+                      const response = await crmService.getUsers({ segment: crmSegment });
+                      setCrmUsers(response.data);
+                    }}
+                  >
+                    Filter
+                  </button>
+                </div>
+
+                <div className="overflow-x-auto rounded-2xl border border-white/10 bg-surface">
+                  <table className="min-w-full text-sm">
+                    <thead className="text-slate-400">
+                      <tr>
+                        <th className="px-4 py-3 text-left">Name</th>
+                        <th className="px-4 py-3 text-left">Email</th>
+                        <th className="px-4 py-3 text-left">Total Spent</th>
+                        <th className="px-4 py-3 text-left">Loyalty Points</th>
+                        <th className="px-4 py-3 text-left">Preferences</th>
+                        <th className="px-4 py-3 text-left">Last Login</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {crmUsers.length === 0 ? (
+                        <tr>
+                          <td className="px-4 py-8 text-center text-slate-400" colSpan="6">
+                            No users found
+                          </td>
+                        </tr>
+                      ) : (
+                        crmUsers.map((u) => (
+                          <tr key={u._id} className="border-t border-white/5 text-slate-200">
+                            <td className="px-4 py-3 font-semibold">{u.name}</td>
+                            <td className="px-4 py-3">{u.email}</td>
+                            <td className="px-4 py-3 font-bold text-emerald-300">₹{u.totalSpent?.toFixed(2) || '0.00'}</td>
+                            <td className="px-4 py-3 font-bold text-amber-300">{u.loyaltyPoints || 0}</td>
+                            <td className="px-4 py-3">
+                              <div className="flex flex-wrap gap-1">
+                                {u.preferences?.slice(0, 3).map((pref, i) => (
+                                  <span key={i} className="rounded-full bg-primary/20 px-2 py-0.5 text-xs text-primary">
+                                    {pref}
+                                  </span>
+                                ))}
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 text-slate-400">
+                              {u.lastLogin ? new Date(u.lastLogin).toLocaleDateString() : 'Never'}
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'erp' && (
+              <div className="space-y-8">
+                <div className="grid gap-4 sm:grid-cols-4">
+                  <div className="rounded-xl border border-white/10 bg-surface p-4">
+                    <p className="text-xs uppercase tracking-wide text-slate-400">Total Revenue</p>
+                    <p className="mt-2 text-2xl font-black text-emerald-300">₹{erpFinances?.revenue?.toFixed(2) || '0.00'}</p>
+                  </div>
+                  <div className="rounded-xl border border-white/10 bg-surface p-4">
+                    <p className="text-xs uppercase tracking-wide text-slate-400">Total Expenses</p>
+                    <p className="mt-2 text-2xl font-black text-red-300">₹{erpFinances?.expenses?.toFixed(2) || '0.00'}</p>
+                  </div>
+                  <div className="rounded-xl border border-white/10 bg-surface p-4">
+                    <p className="text-xs uppercase tracking-wide text-slate-400">Net Profit</p>
+                    <p className="mt-2 text-2xl font-black text-white">₹{erpFinances?.profit?.toFixed(2) || '0.00'}</p>
+                  </div>
+                  <div className="rounded-xl border border-white/10 bg-surface p-4">
+                    <p className="text-xs uppercase tracking-wide text-slate-400">Profit Margin</p>
+                    <p className="mt-2 text-2xl font-black text-primary">{erpFinances?.profitMargin || '0'}%</p>
+                  </div>
+                </div>
+
+                <div className="grid gap-8 lg:grid-cols-2">
+                  <div className="overflow-x-auto rounded-2xl border border-white/10 bg-surface">
+                    <div className="border-b border-white/10 px-5 py-4 text-lg font-bold text-white">
+                      Resources
+                    </div>
+                    <div className="p-4">
+                      {erpResources.length === 0 ? (
+                        <p className="text-center text-slate-400 py-4">No resources found</p>
+                      ) : (
+                        erpResources.map((resource) => (
+                          <div key={resource._id} className="mb-3 flex items-center justify-between rounded-lg border border-white/5 bg-black/40 p-3">
+                            <div>
+                              <p className="font-semibold text-white">{resource.name}</p>
+                              <p className="text-xs text-slate-400 capitalize">{resource.type}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm font-bold text-emerald-300">{resource.availableCapacity} / {resource.totalCapacity} {resource.unit}</p>
+                              <p className="text-xs text-slate-500">Available</p>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="overflow-x-auto rounded-2xl border border-white/10 bg-surface">
+                    <div className="border-b border-white/10 px-5 py-4 text-lg font-bold text-white">
+                      Recent Expenses
+                    </div>
+                    <div className="p-4">
+                      {erpExpenses.length === 0 ? (
+                        <p className="text-center text-slate-400 py-4">No expenses found</p>
+                      ) : (
+                        erpExpenses.slice(0, 5).map((expense) => (
+                          <div key={expense._id} className="mb-3 flex items-center justify-between rounded-lg border border-white/5 bg-black/40 p-3">
+                            <div>
+                              <p className="font-semibold text-white">{expense.description}</p>
+                              <p className="text-xs text-slate-400 capitalize">{expense.category}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm font-bold text-red-300">₹{expense.amount.toFixed(2)}</p>
+                              <p className="text-xs text-slate-500">{expense.status}</p>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </>

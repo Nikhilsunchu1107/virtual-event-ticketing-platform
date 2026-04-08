@@ -39,6 +39,24 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    totalSpent: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    loyaltyPoints: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    preferences: {
+      type: [String],
+      default: [],
+    },
+    lastLogin: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true }
 );

@@ -67,6 +67,20 @@ const eventSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    status: {
+      type: String,
+      enum: ['draft', 'published', 'completed', 'cancelled'],
+      default: 'draft',
+    },
+    budget: {
+      type: Number,
+      min: [0, 'Budget cannot be negative'],
+      default: 0,
+    },
+    resourcesRequired: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Resource',
+    }],
     isActive: {
       type: Boolean,
       default: true,

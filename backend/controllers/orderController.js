@@ -7,6 +7,7 @@ const crypto = require('crypto');
 const Cart = require('../models/Cart');
 const Event = require('../models/Event');
 const Order = require('../models/Order');
+const User = require('../models/User');
 const { sendTicketConfirmation } = require('../utils/email');
 
 /**
@@ -128,6 +129,12 @@ exports.checkout = async (req, res, next) => {
 
     // Create order
     const order = await Order.create(orderData);
+
+    // Update user CRM data (totalSpent and loyaltyPoints)
+    const pointsEarned = Math.floor(orderData.totalAmount); // 1 point per dollar spent
+    await User.findByIdAndUpdate(req.user.id, {
+      $inc: { totalSpent: orderData.totalAmount, loyaltyPoints: pointsEarned },
+    });
 
     // Send confirmation email (mock)
     await sendTicketConfirmation(attendeeEmail, {

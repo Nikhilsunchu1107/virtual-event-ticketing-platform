@@ -103,6 +103,10 @@ exports.login = async (req, res, next) => {
     // Generate token
     const token = generateToken(user._id, user.isAdmin);
 
+    // Update last login time
+    user.lastLogin = new Date();
+    await user.save({ validateBeforeSave: false });
+
     res.status(200).json({
       success: true,
       message: 'Login successful',
