@@ -236,41 +236,51 @@ const AdminDashboard = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {stats.recentOrders?.map((order) => (
-                          <tr key={order._id} className="border-t border-white/5 text-slate-200">
-                            <td className="px-5 py-3">{order.orderNumber}</td>
-                            <td className="px-5 py-3">{order.user?.name}</td>
-                            <td className="px-5 py-3">₹{order.totalAmount.toFixed(2)}</td>
-                            <td className="px-5 py-3">{order.orderStatus}</td>
+                        {!stats.recentOrders || stats.recentOrders.length === 0 ? (
+                          <tr>
+                            <td className="px-5 py-8 text-center text-slate-400" colSpan="4">
+                              No orders yet
+                            </td>
                           </tr>
-                        ))}
+                        ) : (
+                          stats.recentOrders.map((order) => (
+                            <tr key={order._id} className="border-t border-white/5 text-slate-200">
+                              <td className="px-5 py-3">{order.orderNumber}</td>
+                              <td className="px-5 py-3">{order.user?.name}</td>
+                              <td className="px-5 py-3">₹{order.totalAmount.toFixed(2)}</td>
+                              <td className="px-5 py-3">{order.orderStatus}</td>
+                            </tr>
+                          ))
+                        )}
                       </tbody>
                     </table>
                   </div>
 
-                  {stats.topEvents && stats.topEvents.length > 0 && (
                   <div className="overflow-x-auto rounded-2xl border border-white/10 bg-surface">
                     <div className="border-b border-white/10 px-5 py-4 text-lg font-bold text-white">
                       Top Events
                     </div>
                     <div className="p-4 flex flex-col gap-4">
-                      {stats.topEvents.map((event) => (
-                        <div key={event._id} className="flex justify-between items-center bg-black/40 p-4 rounded-xl border border-white/5">
-                          <div>
-                            <p className="font-bold text-white mb-1">{event.title}</p>
-                            <p className="text-sm text-slate-400">
-                              {event.ticketsSold} / {event.ticketsAvailable} tickets sold
-                            </p>
+                      {!stats.topEvents || stats.topEvents.length === 0 ? (
+                        <p className="text-center text-slate-400 py-4">No events found</p>
+                      ) : (
+                        stats.topEvents.map((event) => (
+                          <div key={event._id} className="flex justify-between items-center bg-black/40 p-4 rounded-xl border border-white/5">
+                            <div>
+                              <p className="font-bold text-white mb-1">{event.title}</p>
+                              <p className="text-sm text-slate-400">
+                                {event.ticketsSold} / {event.ticketsAvailable} tickets sold
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-bold text-primary">₹{(event.price * event.ticketsSold).toFixed(2)}</p>
+                              <p className="text-xs text-slate-500 uppercase">Revenue</p>
+                            </div>
                           </div>
-                          <div className="text-right">
-                            <p className="font-bold text-primary">₹{(event.price * event.ticketsSold).toFixed(2)}</p>
-                            <p className="text-xs text-slate-500 uppercase">Revenue</p>
-                          </div>
-                        </div>
-                      ))}
+                        ))
+                      )}
                     </div>
                   </div>
-                  )}
                 </div>
               </div>
             )}
@@ -645,7 +655,7 @@ const AdminDashboard = () => {
                     className="rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white"
                   >
                     <option value="">All Users</option>
-                    <option value="vip">VIP (>$500 spent)</option>
+                    <option value="vip">VIP (&gt;$500 spent)</option>
                     <option value="new_users">New Users (30 days)</option>
                     <option value="inactive">Inactive (90 days)</option>
                   </select>
