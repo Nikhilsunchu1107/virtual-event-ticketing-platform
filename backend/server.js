@@ -6,19 +6,32 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
+const hpp = require('hpp');
 const connectDB = require('./config/database');
 const errorHandler = require('./middleware/errorHandler');
+const { genericLimiter } = require('./middleware/rateLimiter');
 
-// Connect to MongoDB
 connectDB();
 
-// Initialize Express app
 const app = express();
 
-// Middleware
+app.use(helmet());
+
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+app.use(mongoSanitize());
+
+app.use(xss());
+
+app.use(hpp());
+
+app.use(genericLimiter);
 
 // Request logging middleware
 app.use((req, res, next) => {
