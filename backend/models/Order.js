@@ -85,6 +85,10 @@ const orderSchema = new mongoose.Schema(
       default: '',
     },
     notes: String,
+    referralSource: {
+      type: String,
+      default: null,
+    },
     createdAt: {
       type: Date,
       default: Date.now,

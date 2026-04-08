@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import eventService from '../services/eventService';
 import cartService from '../services/cartService';
+import SEO from '../components/SEO';
 
 const highlights = [
   {
@@ -114,6 +115,11 @@ const EventDetails = () => {
 
   return (
     <div>
+      <SEO 
+        title={event?.title}
+        description={event?.description?.substring(0, 160)}
+        image={event?.bannerImage}
+      />
       <div className="mx-auto max-w-[1200px] px-4 py-6">
         <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-widest">
           <Link to="/" className="text-slate-500 hover:text-primary">

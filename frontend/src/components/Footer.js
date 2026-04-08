@@ -4,6 +4,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+import NewsletterSignup from './NewsletterSignup';
 
 const Footer = () => {
   return (
@@ -107,16 +108,7 @@ const Footer = () => {
           <div>
             <h4 className="mb-6 font-bold text-white">Newsletter</h4>
             <p className="mb-4 text-sm text-slate-500">Get the latest event drops in your inbox.</p>
-            <div className="flex flex-col gap-3">
-              <input
-                type="email"
-                placeholder="Email address"
-                className="w-full rounded-lg border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition-all placeholder:text-slate-600 focus:border-primary focus:ring-2 focus:ring-primary/40"
-              />
-              <button className="rounded-lg bg-primary py-3 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/90">
-                Subscribe
-              </button>
-            </div>
+            <NewsletterSignup />
           </div>
         </div>
 

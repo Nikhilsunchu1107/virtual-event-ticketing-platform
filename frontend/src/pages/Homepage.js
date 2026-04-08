@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import eventService from '../services/eventService';
+import SEO from '../components/SEO';
 
 const CATEGORY_ICONS = {
   Music: 'music_note',
@@ -40,6 +41,10 @@ const Homepage = () => {
 
   return (
     <div>
+      <SEO 
+        title="Home"
+        description="Discover and book virtual events happening around you. Join exclusive virtual gatherings from the comfort of your home."
+      />
       <section className="relative flex min-h-[870px] items-center overflow-hidden">
         <div className="absolute inset-0 z-0 bg-gradient-to-br from-primary/10 via-black to-black">
           <div className="absolute -right-20 top-1/4 h-96 w-96 rounded-full bg-primary/20 blur-[120px]"></div>

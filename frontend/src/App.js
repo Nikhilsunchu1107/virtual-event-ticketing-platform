@@ -3,11 +3,12 @@
  * Routes and layout management
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import { setReferralSource } from './utils/tracking';
 
 // Pages
 import Homepage from './pages/Homepage';
@@ -22,6 +23,8 @@ import MyTickets from './pages/MyTickets';
 import SupportCenter from './pages/SupportCenter';
 import AdminDashboard from './pages/AdminDashboard';
 import Contact from './pages/Contact';
+import SummerPromo from './pages/SummerPromo';
+import BlackFridayPromo from './pages/BlackFridayPromo';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -54,6 +57,10 @@ const AdminRoute = ({ children }) => {
 };
 
 function AppContent() {
+  useEffect(() => {
+    setReferralSource();
+  }, []);
+
   return (
     <>
       <Header />
@@ -65,6 +72,8 @@ function AppContent() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/promo/summer" element={<SummerPromo />} />
+        <Route path="/promo/black-friday" element={<BlackFridayPromo />} />
 
         {/* Protected Routes */}
         <Route
