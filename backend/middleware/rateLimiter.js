@@ -12,11 +12,11 @@ const genericLimiter = rateLimit({
 });
 
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
+  windowMs: 10 * 1000,
   max: 5,
   message: {
     success: false,
-    message: 'Too many login attempts, please try again after 15 minutes',
+    message: 'Too many login attempts, please try again after 10 seconds',
   },
   standardHeaders: true,
   legacyHeaders: false,
